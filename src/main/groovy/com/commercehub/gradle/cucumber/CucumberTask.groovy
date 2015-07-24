@@ -27,6 +27,7 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     Boolean isStrict = null
     String snippets = null
     Map<String, String> systemProperties = [:]
+    boolean junitReport = null
 
     @TaskAction
     void runTests() {
@@ -133,5 +134,9 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
 
     void systemProperty(String property, String value) {
         systemProperties[property] = value
+    }
+
+    boolean getJunitReport() {
+        return junitReport ?: extension.junitReport
     }
 }
