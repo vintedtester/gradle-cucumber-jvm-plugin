@@ -15,7 +15,7 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     public static final String CUCUMBER_REPORTS_DIR = 'cucumber'
     public static final String CUCUMBER_EXTENSION_NAME = 'cucumber'
 
-    private SourceSet sourceSet
+    SourceSet sourceSet
     private final CucumberExtension extension = project.extensions[CUCUMBER_EXTENSION_NAME]
 
     List<String> tags = null
@@ -26,11 +26,13 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     Boolean isMonochrome = null
     Boolean isStrict = null
     String snippets = null
+    Map<String, String> systemProperties = [:]
 
     @TaskAction
     void runTests() {
         ProgressLoggerFactory progressLoggerFactory = services.get(ProgressLoggerFactory)
-        CucumberRunner runner = new CucumberRunner(this, new CucumberTestResultCounter(progressLoggerFactory, logger))
+        CucumberRunner runner = new CucumberRunner(this, new CucumberTestResultCounter(progressLoggerFactory, logger),
+                                                   systemProperties)
         boolean isPassing = runner.run(sourceSet, resultsDir, reportsDir)
         generateReport()
 
@@ -127,5 +129,9 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
 
     String getSnippets() {
         return snippets ?: extension.snippets
+    }
+
+    void systemProperty(String property, String value) {
+        systemProperties[property] = value
     }
 }

@@ -41,4 +41,16 @@ class CucumberPluginSpec extends PluginProjectSpec {
         project.tasks.findByName(suiteName)
         project.tasks.findByName(suiteName).sourceSet == project.sourceSets.findByName(suiteName)
     }
+
+    def testAddCucumberSuiteCanTakeOverTestSourceSet() {
+        final String suiteName = 'test'
+
+        when:
+        project.apply(plugin: 'java')
+        project.apply(plugin: pluginName)
+        project.addCucumberSuite(suiteName)
+
+        then:
+        project.tasks.findByName(suiteName) instanceof CucumberTask
+    }
 }

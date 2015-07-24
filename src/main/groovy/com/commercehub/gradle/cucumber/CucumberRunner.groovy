@@ -16,10 +16,13 @@ import java.nio.file.Paths
 class CucumberRunner {
     CucumberRunnerOptions options
     CucumberTestResultCounter testResultCounter
+    Map<String, String> environment
 
-    CucumberRunner(CucumberRunnerOptions options, CucumberTestResultCounter testResultCounter) {
+    CucumberRunner(CucumberRunnerOptions options, CucumberTestResultCounter testResultCounter,
+                   Map<String, String> environment) {
         this.options = options
         this.testResultCounter = testResultCounter
+        this.environment = environment
     }
 
     boolean run(SourceSet sourceSet, File resultsDir, File reportsDir) {
@@ -64,6 +67,7 @@ class CucumberRunner {
                         .setArgs(args)
                         .setConsoleOutLogFile(consoleOutLogFile)
                         .setConsoleErrLogFile(consoleErrLogFile)
+                        .setEnv(environment)
                         .execute()
                 List<CucumberFeatureResult> results = parseFeatureResult(resultsFile).collect {
                     log.debug("Logging result for $it.name")

@@ -13,6 +13,7 @@ class JavaProcessLauncher {
     List<String> args = []
     File consoleOutLogFile
     File consoleErrLogFile
+    Map<String, String> env = [:]
 
     JavaProcessLauncher(String mainClassName, List<File> classpath) {
         this.mainClassName = mainClassName
@@ -34,6 +35,11 @@ class JavaProcessLauncher {
         return this
     }
 
+    JavaProcessLauncher setEnv(Map<String, String> env) {
+        this.env = env
+        return this
+    }
+
     int execute() {
         List<String> command = []
         command << javaCommand
@@ -48,6 +54,9 @@ class JavaProcessLauncher {
         }
         if (consoleErrLogFile) {
             processExecutor.redirectError(consoleErrLogFile.newDataOutputStream())
+        }
+        if (!env.isEmpty()) {
+            processExecutor.environment(env)
         }
         log.debug("Running command [${command.join(' ')}]")
         return processExecutor.execute().exitValue

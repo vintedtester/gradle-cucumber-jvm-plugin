@@ -12,6 +12,7 @@ ruleset {
     ruleset('rulesets/design.xml') {
         'AbstractClassWithoutAbstractMethod' enabled: false
         'AbstractClassWithPublicConstructor' enabled: false
+        'Instanceof' enabled: false
     }
     ruleset('rulesets/dry.xml')
     ruleset('rulesets/exceptions.xml')

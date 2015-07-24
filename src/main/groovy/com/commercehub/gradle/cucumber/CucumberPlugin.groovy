@@ -23,10 +23,9 @@ class CucumberPlugin implements Plugin<Project> {
                         compileClasspath += project.sourceSets[DEFAULT_PARENT_SOURCESET].compileClasspath
                         runtimeClasspath = it.output + it.compileClasspath
                     }
-            project.tasks.create(name: sourceSetName, type: CucumberTask,
-                    dependsOn: cucumberSuiteSourceSet.classesTaskName) {
-                sourceSet cucumberSuiteSourceSet
-            }
+            CucumberTask task = project.tasks.replace(sourceSetName, CucumberTask)
+            task.dependsOn cucumberSuiteSourceSet.classesTaskName
+            task.sourceSet = cucumberSuiteSourceSet
         }
     }
 }
