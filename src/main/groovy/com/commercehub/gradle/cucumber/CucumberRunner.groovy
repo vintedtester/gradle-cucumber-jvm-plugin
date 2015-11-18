@@ -4,10 +4,12 @@ import groovy.util.logging.Slf4j
 import groovyx.gpars.GParsPool
 import net.masterthought.cucumber.ReportParser
 import net.masterthought.cucumber.json.Feature
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.SourceSet
 
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Created by jgelais on 6/16/15.
@@ -28,6 +30,8 @@ class CucumberRunner {
     }
 
     boolean run(SourceSet sourceSet, File resultsDir, File reportsDir) {
+        AtomicBoolean hasFeatureParseErrors = new AtomicBoolean(false)
+
         def features = sourceSet.resources.matching {
             options.featureRoots.each {
                 include("${it}/**/*.feature")
@@ -76,14 +80,25 @@ class CucumberRunner {
                         .setConsoleErrLogFile(consoleErrLogFile)
                         .setEnv(environment)
                         .execute()
-                List<CucumberFeatureResult> results = parseFeatureResult(resultsFile).collect {
-                    log.debug("Logging result for $it.name")
-                    createResult(it)
-                }
-                results.each { CucumberFeatureResult result ->
-                    testResultCounter.afterFeature(result)
+                if (resultsFile.exists()) {
+                    List<CucumberFeatureResult> results = parseFeatureResult(resultsFile).collect {
+                        log.debug("Logging result for $it.name")
+                        createResult(it)
+                    }
+                    results.each { CucumberFeatureResult result ->
+                        testResultCounter.afterFeature(result)
+                    }
+                } else {
+                    hasFeatureParseErrors.set(true)
+                    if (consoleErrLogFile.exists()) {
+                        log.error(consoleErrLogFile.text)
+                    }
                 }
             }
+        }
+
+        if (hasFeatureParseErrors.get()) {
+            throw new GradleException('One or more feature files failed to parse. See error output above')
         }
 
         testResultCounter.afterSuite()
