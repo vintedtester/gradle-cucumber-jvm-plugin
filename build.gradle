@@ -8,6 +8,9 @@ plugins {
     id "com.jfrog.bintray" version "1.2"
 }
 
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
 repositories {
     maven {
         url "http://repo.bodar.com"
