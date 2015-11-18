@@ -32,7 +32,7 @@ to run up to 3 parallel forks. The *cucumberTest* source set will depend on the 
             jcenter()
         }
         dependencies {
-            classpath 'com.commercehub:gradle-cucumber-jvm-plugin:0.1'
+            classpath 'com.commercehub:gradle-cucumber-jvm-plugin:0.3'
         }
     }
     apply plugin: 'java'            
