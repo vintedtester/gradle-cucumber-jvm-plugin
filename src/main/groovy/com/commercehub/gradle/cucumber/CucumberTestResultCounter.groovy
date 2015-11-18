@@ -81,7 +81,7 @@ class CucumberTestResultCounter {
     }
 
     public boolean hadFailures() {
-        return (failedScenarios > 0)
+        return (failedScenarios > 0 || failedSteps > 0)
     }
 
 }
