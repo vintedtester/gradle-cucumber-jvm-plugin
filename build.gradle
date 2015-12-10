@@ -11,6 +11,17 @@ plugins {
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
+sourceSets {
+    intTest {
+        compileClasspath += sourceSets.main.runtimeClasspath
+    }
+}
+
+task intTest(type: Test) {
+    testClassesDir = sourceSets.intTest.output.classesDir
+    classpath += sourceSets.intTest.runtimeClasspath
+}
+
 repositories {
     maven {
         url "http://repo.bodar.com"
@@ -25,8 +36,11 @@ dependencies {
     compile 'org.zeroturnaround:zt-exec:1.8'
     compile 'net.masterthought:cucumber-reporting:0.1.0'
 
-    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
-    testCompile 'com.netflix.nebula:nebula-test:2.2.1'
+    //testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+    testCompile 'com.netflix.nebula:nebula-test:3.1.0'
+
+    //intTestCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+    intTestCompile 'com.netflix.nebula:nebula-test:3.1.0'
 }
 
 codenarc {
@@ -36,9 +50,14 @@ codenarc {
 
 cobertura {
     coverageIgnoreTrivial = true
+    auxiliaryClasspath += project.sourceSets.main.runtimeClasspath
 }
 
 test {
+    finalizedBy coberturaReport
+}
+
+intTest {
     finalizedBy coberturaReport
 }
 

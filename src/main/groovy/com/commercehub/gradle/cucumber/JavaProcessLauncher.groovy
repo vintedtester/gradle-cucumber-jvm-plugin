@@ -49,6 +49,7 @@ class JavaProcessLauncher {
         command.addAll(args)
 
         ProcessExecutor processExecutor = new ProcessExecutor().command(command)
+        processExecutor.directory(new File('.'))
         if (consoleOutLogFile) {
             processExecutor.redirectOutput(consoleOutLogFile.newOutputStream())
         }
