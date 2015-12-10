@@ -1,12 +1,15 @@
 package com.commercehub.gradle.cucumber
 
+import groovy.util.logging.Slf4j
 import nebula.test.IntegrationSpec
 import nebula.test.functional.ExecutionResult
+import org.gradle.api.GradleException
 
 /**
  * Created by jgelais on 11/19/15.
  */
 @SuppressWarnings('DuplicateStringLiteral')
+@Slf4j
 class CucumberIntegrationSpec extends IntegrationSpec {
     def setup() {
         copyResources('teststeps/TestSteps.groovy', 'src/test/groovy/cucumber/steps/TestSteps.groovy')
@@ -29,25 +32,28 @@ class CucumberIntegrationSpec extends IntegrationSpec {
 
     def testHappyPath() {
         given:
-        copyResources('testfeatures/happypath.feature', 'src/test/resources/features/happypath.features')
+        copyResources('testfeatures/happypath.feature', 'src/test/resources/features/happypath.feature')
 
         when:
         ExecutionResult result = runTasksSuccessfully('test')
+        log.info(result.standardOutput)
 
         then:
         !result.wasUpToDate(':compileTestGroovy')
         result.wasExecuted(':test')
+        fileExists('build/reports/tests/cucumber/test/features-happypath-feature.html')
     }
 
     def testFailingBackgroundStep() {
         given:
         copyResources('testfeatures/failing-background-test.feature',
-                'src/test/resources/features/failing-background-test.features')
+                'src/test/resources/features/failing-background-test.feature')
 
         when:
         ExecutionResult result = runTasksSuccessfully('test')
+        log.info(result.standardOutput)
 
         then:
-        result.success
+        thrown GradleException
     }
 }

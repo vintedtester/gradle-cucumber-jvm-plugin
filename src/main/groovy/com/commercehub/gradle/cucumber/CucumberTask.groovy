@@ -82,7 +82,7 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
      *  shortens uri in json files to relative path.
      *  @param List<String> jsonFilesList - list of fully qualified paths to the JSON files to be modified.
      */
-    private static void setJsonFileUriToRelativePaths(List<String> jsonFileList) {
+    private void setJsonFileUriToRelativePaths(List<String> jsonFileList) {
         String absolutePath
         String relativePath
         Pattern pattern = Pattern.compile('\\s.*"uri":(?: |)"(.*?)".*\\s')
@@ -92,7 +92,8 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
             if (content.contains('"uri":')) {
                 Matcher matcher = pattern.matcher(content)
                 absolutePath = matcher[0][1]
-                relativePath = '../' + absolutePath.substring(absolutePath.lastIndexOf('src'))
+                String featureRoot = "src/${sourceSet.name}/resources/"
+                relativePath = absolutePath.substring(absolutePath.lastIndexOf(featureRoot) + featureRoot.length())
                 content = content.replace(absolutePath, relativePath)
                 thisFile.write(content)
             }

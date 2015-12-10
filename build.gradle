@@ -6,21 +6,12 @@ plugins {
     id 'maven-publish'
     id 'net.researchgate.release' version '2.1.2'
     id "com.jfrog.bintray" version "1.2"
+    id 'nebula.integtest' version '3.0.3'
 }
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-sourceSets {
-    intTest {
-        compileClasspath += sourceSets.main.runtimeClasspath
-    }
-}
-
-task intTest(type: Test) {
-    testClassesDir = sourceSets.intTest.output.classesDir
-    classpath += sourceSets.intTest.runtimeClasspath
-}
 
 repositories {
     maven {
@@ -40,7 +31,7 @@ dependencies {
     testCompile 'com.netflix.nebula:nebula-test:3.1.0'
 
     //intTestCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
-    intTestCompile 'com.netflix.nebula:nebula-test:3.1.0'
+    integTestCompile 'com.netflix.nebula:nebula-test:3.1.0'
 }
 
 sourceSets {
@@ -64,7 +55,7 @@ test {
     finalizedBy coberturaReport
 }
 
-intTest {
+integrationTest {
     finalizedBy coberturaReport
 }
 
