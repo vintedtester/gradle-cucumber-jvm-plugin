@@ -23,10 +23,17 @@ dependencies {
 
     compile 'org.codehaus.gpars:gpars:1.2.1'
     compile 'org.zeroturnaround:zt-exec:1.8'
-    compile 'net.masterthought:cucumber-reporting:0.1.0'
+    compile 'net.masterthought:cucumber-reporting:0.6.0'
 
     testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
     testCompile 'com.netflix.nebula:nebula-test:2.2.1'
+}
+
+sourceSets {
+    test {
+        //remove incompatible jar from test class path
+        runtimeClasspath = runtimeClasspath.minus files("$gradle.gradleHomeDir/lib/commons-io-1.4.jar")
+    }
 }
 
 codenarc {
