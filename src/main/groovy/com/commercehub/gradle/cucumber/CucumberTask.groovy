@@ -8,8 +8,12 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.logging.ConsoleRenderer
 import org.gradle.logging.ProgressLoggerFactory
 
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 /**
  * Created by jgelais on 6/11/15.
+ * rholman 12/12/15 - added logic to shorten uri in json files to relative path.
  */
 class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     public static final String CUCUMBER_REPORTS_DIR = 'cucumber'
@@ -33,7 +37,7 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     void runTests() {
         ProgressLoggerFactory progressLoggerFactory = services.get(ProgressLoggerFactory)
         CucumberRunner runner = new CucumberRunner(this, new CucumberTestResultCounter(progressLoggerFactory, logger),
-                                                   systemProperties)
+                systemProperties)
         boolean isPassing = runner.run(sourceSet, resultsDir, reportsDir)
         generateReport()
 
@@ -52,6 +56,9 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
         resultsDir.eachFileMatch(~/^.*\.json$/) {
             jsonReportFiles << it.absolutePath
         }
+
+        setJsonFileUriToRelativePaths(jsonReportFiles)
+
         ReportBuilder reportBuilder = new ReportBuilder(
                 jsonReportFiles,
                 reportsDir,
@@ -65,11 +72,31 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
                 false,
                 false,
                 false,
-                '',
-                false,
                 true
         )
         reportBuilder.generateReports()
+    }
+
+    @SuppressWarnings('UnnecessarySubstring')
+    /**
+     *  shortens uri in json files to relative path.
+     *  @param List<String> jsonFilesList - list of fully qualified paths to the JSON files to be modified.
+     */
+    private static void setJsonFileUriToRelativePaths(List<String> jsonFileList) {
+        String absolutePath
+        String relativePath
+        Pattern pattern = Pattern.compile('\\s.*"uri":(?: |)"(.*?)".*\\s')
+        jsonFileList.each { String fileName ->
+            File thisFile = new File(fileName)
+            String content = thisFile.text
+            if (content.contains('"uri":')) {
+                Matcher matcher = pattern.matcher(content)
+                absolutePath = matcher[0][1]
+                relativePath = '../' + absolutePath.substring(absolutePath.lastIndexOf('src'))
+                content = content.replace(absolutePath, relativePath)
+                thisFile.write(content)
+            }
+        }
     }
 
     File getResultsDir() {
