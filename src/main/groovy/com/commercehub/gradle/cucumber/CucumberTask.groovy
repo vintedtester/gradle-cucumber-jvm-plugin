@@ -1,15 +1,11 @@
 package com.commercehub.gradle.cucumber
 
-import net.masterthought.cucumber.ReportBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
 import org.gradle.logging.ConsoleRenderer
 import org.gradle.logging.ProgressLoggerFactory
-
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 /**
  * Created by jgelais on 6/11/15.
@@ -39,65 +35,25 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
         CucumberRunner runner = new CucumberRunner(this, new CucumberTestResultCounter(progressLoggerFactory, logger),
                 systemProperties)
         boolean isPassing = runner.run(sourceSet, resultsDir, reportsDir)
-        generateReport()
+        new MasterThoughtReportGenerator(this).generateReport(jsonReportFiles)
 
         if (!isPassing) {
             handleTestFailures()
         }
     }
 
+    List<File> getJsonReportFiles() {
+        List<File> files = []
+        resultsDir.eachFileMatch(~/^.*\.json$/) {
+            files << it
+        }
+
+        return files
+    }
+
     @SuppressWarnings('ConfusingMethodName')
     def sourceSet(SourceSet sourceSet) {
         this.sourceSet = sourceSet
-    }
-
-    private void generateReport() {
-        List<String> jsonReportFiles = []
-        resultsDir.eachFileMatch(~/^.*\.json$/) {
-            jsonReportFiles << it.absolutePath
-        }
-
-        setJsonFileUriToRelativePaths(jsonReportFiles)
-
-        ReportBuilder reportBuilder = new ReportBuilder(
-                jsonReportFiles,
-                reportsDir,
-                '',
-                '',
-                project.name,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                true
-        )
-        reportBuilder.generateReports()
-    }
-
-    @SuppressWarnings('UnnecessarySubstring')
-    /**
-     *  shortens uri in json files to relative path.
-     *  @param List<String> jsonFilesList - list of fully qualified paths to the JSON files to be modified.
-     */
-    private void setJsonFileUriToRelativePaths(List<String> jsonFileList) {
-        String absolutePath
-        String relativePath
-        Pattern pattern = Pattern.compile('\\s.*"uri":(?: |)"(.*?)".*\\s')
-        jsonFileList.each { String fileName ->
-            File thisFile = new File(fileName)
-            String content = thisFile.text
-            if (content.contains('"uri":')) {
-                Matcher matcher = pattern.matcher(content)
-                absolutePath = matcher[0][1]
-                String featureRoot = "src/${sourceSet.name}/resources/"
-                relativePath = absolutePath.substring(absolutePath.lastIndexOf(featureRoot) + featureRoot.length())
-                content = content.replace(absolutePath, relativePath)
-                thisFile.write(content)
-            }
-        }
     }
 
     File getResultsDir() {
