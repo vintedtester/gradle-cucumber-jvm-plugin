@@ -66,9 +66,8 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     }
 
     File getReportsDir() {
-        File projectReportsDir = (File) project.property('testReportDir')
-        File cucumberReports = new File(projectReportsDir, CUCUMBER_REPORTS_DIR)
-        File sourceSetReports = new File(cucumberReports, sourceSet.name)
+        File projectReportsDir = (File) project.property('reportsDir')
+        File sourceSetReports = new File(projectReportsDir, sourceSet.name)
 
         return sourceSetReports
     }

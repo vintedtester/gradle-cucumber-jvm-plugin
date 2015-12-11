@@ -41,7 +41,7 @@ class CucumberIntegrationSpec extends IntegrationSpec {
         then:
         !result.wasUpToDate(':compileTestGroovy')
         result.wasExecuted(':test')
-        fileExists('build/reports/tests/cucumber/test/features-happypath-feature.html')
+        fileExists('build/reports/test/features-happypath-feature.html')
     }
 
     def testFailingBackgroundStep() {
