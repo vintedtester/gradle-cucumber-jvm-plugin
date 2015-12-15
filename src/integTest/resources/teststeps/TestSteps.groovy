@@ -23,4 +23,9 @@ class TestSteps {
     def iFailMyAssertion() {
         assert 1 == 2
     }
+
+    @Then('the value of sysprop (.*) is (.*)')
+    def checkSysprop(String key, String value) {
+        assert System.properties.getProperty(key) == value
+    }
 }

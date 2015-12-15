@@ -13,7 +13,7 @@ class JavaProcessLauncher {
     List<String> args = []
     File consoleOutLogFile
     File consoleErrLogFile
-    Map<String, String> env = [:]
+    Map<String, String> systemProperties = [:]
 
     JavaProcessLauncher(String mainClassName, List<File> classpath) {
         this.mainClassName = mainClassName
@@ -35,8 +35,8 @@ class JavaProcessLauncher {
         return this
     }
 
-    JavaProcessLauncher setEnv(Map<String, String> env) {
-        this.env = env
+    JavaProcessLauncher setSystemProperties(Map<String, String> systemProperties) {
+        this.systemProperties = systemProperties
         return this
     }
 
@@ -45,6 +45,11 @@ class JavaProcessLauncher {
         command << javaCommand
         command << '-cp'
         command << classPathAsString
+        if (!systemProperties.isEmpty()) {
+            systemProperties.keySet().each { key ->
+                command << "-D${key}=${systemProperties.get(key)}".toString()
+            }
+        }
         command << mainClassName
         command.addAll(args)
 
@@ -54,9 +59,6 @@ class JavaProcessLauncher {
         }
         if (consoleErrLogFile) {
             processExecutor.redirectError(consoleErrLogFile.newDataOutputStream())
-        }
-        if (!env.isEmpty()) {
-            processExecutor.environment(env)
         }
         log.debug("Running command [${command.join(' ')}]")
         return processExecutor.execute().exitValue

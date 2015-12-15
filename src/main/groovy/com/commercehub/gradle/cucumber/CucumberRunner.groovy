@@ -20,13 +20,13 @@ class CucumberRunner {
 
     CucumberRunnerOptions options
     CucumberTestResultCounter testResultCounter
-    Map<String, String> environment
+    Map<String, String> systemProperties
 
     CucumberRunner(CucumberRunnerOptions options, CucumberTestResultCounter testResultCounter,
-                   Map<String, String> environment) {
+                   Map<String, String> systemProperties) {
         this.options = options
         this.testResultCounter = testResultCounter
-        this.environment = environment
+        this.systemProperties = systemProperties
     }
 
     boolean run(SourceSet sourceSet, File resultsDir, File reportsDir) {
@@ -78,7 +78,7 @@ class CucumberRunner {
                         .setArgs(args)
                         .setConsoleOutLogFile(consoleOutLogFile)
                         .setConsoleErrLogFile(consoleErrLogFile)
-                        .setEnv(environment)
+                        .setSystemProperties(systemProperties)
                         .execute()
                 if (resultsFile.exists()) {
                     List<CucumberFeatureResult> results = parseFeatureResult(resultsFile).collect {
