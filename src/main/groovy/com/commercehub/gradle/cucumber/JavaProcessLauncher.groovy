@@ -61,7 +61,7 @@ class JavaProcessLauncher {
             processExecutor.redirectError(consoleErrLogFile.newDataOutputStream())
         }
         log.debug("Running command [${command.join(' ')}]")
-        return processExecutor.execute().exitValue
+        return processExecutor.destroyOnExit().execute().exitValue
     }
 
     String getClassPathAsString() {
