@@ -35,6 +35,8 @@ class CucumberPlugin implements Plugin<Project> {
                     testSourceDirs += cucumberSuiteSourceSet.resources.srcDirs
                 }
             }
+
+            return cucumberSuiteSourceSet
         }
     }
 }
