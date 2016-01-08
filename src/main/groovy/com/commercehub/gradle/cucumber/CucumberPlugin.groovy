@@ -4,6 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.SourceSet
+import org.gradle.plugins.ide.idea.IdeaPlugin
 
 /**
  * This is the main plugin file. Put a description of your plugin here.
@@ -26,6 +27,14 @@ class CucumberPlugin implements Plugin<Project> {
             CucumberTask task = project.tasks.replace(sourceSetName, CucumberTask)
             task.dependsOn cucumberSuiteSourceSet.classesTaskName
             task.sourceSet = cucumberSuiteSourceSet
+
+            // configure source set in intellij if plugin is applied
+            project.plugins.withType(IdeaPlugin) {
+                project.idea.module {
+                    testSourceDirs += cucumberSuiteSourceSet.allSource.srcDirs
+                    testSourceDirs += cucumberSuiteSourceSet.resources.srcDirs
+                }
+            }
         }
     }
 }
