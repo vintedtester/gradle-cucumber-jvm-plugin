@@ -87,6 +87,7 @@ class CucumberRunner {
                     }
                     results.each { CucumberFeatureResult result ->
                         testResultCounter.afterFeature(result)
+                        logIfFailure(sourceSet, consoleOutLogFile, result)
                     }
                 } else {
                     hasFeatureParseErrors.set(true)
@@ -146,5 +147,11 @@ class CucumberRunner {
         Path child = Paths.get(file.toURI())
         Path parent = Paths.get(dir.toURI())
         return child.startsWith(parent)
+    }
+
+    private void logIfFailure(SourceSet sourceSet, File logFile, CucumberFeatureResult result) {
+        if (result.failedSteps > 0) {
+           log.error('{}:\r\n {}', sourceSet.name, logFile.text)
+        }
     }
 }
