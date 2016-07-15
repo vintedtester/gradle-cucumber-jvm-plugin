@@ -58,9 +58,12 @@ class MasterThoughtReportGenerator implements ReportGenerator {
                 Matcher matcher = pattern.matcher(content)
                 absolutePath = matcher[0][1]
                 String featureRoot = "src/${parentTask.sourceSet.name}/resources/"
-                relativePath = absolutePath[absolutePath.lastIndexOf(featureRoot) + featureRoot.length()..-1]
-                content = content.replace(absolutePath, relativePath)
-                thisFile.write(content)
+                def lastIndexOfFeatureRoot = absolutePath.lastIndexOf(featureRoot)
+                if (lastIndexOfFeatureRoot != -1) {
+                    relativePath = absolutePath[absolutePath.lastIndexOf(featureRoot) + featureRoot.length()..-1]
+                    content = content.replace(absolutePath, relativePath)
+                    thisFile.write(content)
+                }
             }
         }
     }
