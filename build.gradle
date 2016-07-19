@@ -7,6 +7,7 @@ plugins {
     id 'net.researchgate.release' version '2.1.2'
     id "com.jfrog.bintray" version "1.2"
     id 'nebula.integtest' version '3.0.3'
+    id 'com.gradle.plugin-publish' version '0.9.4'
 }
 
 sourceCompatibility = 1.7
@@ -108,3 +109,21 @@ bintray {
 }
 bintrayUpload.dependsOn build, sourcesJar, javadocJar
 createReleaseTag.dependsOn bintrayUpload
+createReleaseTag.dependsOn publishPlugins
+
+pluginBundle {
+    website = "https://github.com/commercehub-oss/gradle-cucumber-jvm-plugin"
+    vcsUrl = "https://github.com/commercehub-oss/gradle-cucumber-jvm-plugin"
+    description = "The gradle cucumber-jvm plugin provides the ability to run cucumber acceptance tests directly from a gradle build."
+    tags = ["cucumber", "java", "testing"]
+    plugins {
+        cucumberJvm {
+            id = "com.commercehub.cucumber-jvm"
+            displayName = "Cucumber-JVM Plugin"
+        }
+    }
+    mavenCoordinates {
+        groupId = "com.commercehub"
+        artifactId = "gradle-cucumber-jvm-plugin"
+    }
+}
