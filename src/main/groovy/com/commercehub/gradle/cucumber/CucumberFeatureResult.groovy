@@ -10,5 +10,11 @@ class CucumberFeatureResult {
     long failedSteps = 0
     long skippedSteps = 0
     long pendingSteps = 0
+    long undefinedSteps = 0
+
     List<String> failureNotes = []
+
+    boolean hadFailures() {
+        return (failedScenarios > 0 || failedSteps > 0 || undefinedSteps > 0)
+    }
 }

@@ -1,5 +1,6 @@
 package com.commercehub.gradle.cucumber
 
+import net.masterthought.cucumber.Configuration
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.SourceSet
@@ -32,10 +33,10 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     @TaskAction
     void runTests() {
         ProgressLoggerFactory progressLoggerFactory = services.get(ProgressLoggerFactory)
-        CucumberRunner runner = new CucumberRunner(this, new CucumberTestResultCounter(progressLoggerFactory, logger),
-                systemProperties)
+        CucumberRunner runner = new CucumberRunner(this, configuration,
+                new CucumberTestResultCounter(progressLoggerFactory, logger), systemProperties)
         boolean isPassing = runner.run(sourceSet, resultsDir, reportsDir)
-        new MasterThoughtReportGenerator(this).generateReport(jsonReportFiles)
+        new MasterThoughtReportGenerator(this, configuration).generateReport(jsonReportFiles)
 
         if (!isPassing) {
             handleTestFailures()
@@ -49,6 +50,15 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
         }
 
         return files
+    }
+
+    Configuration getConfiguration() {
+        Configuration configuration = new Configuration(reportsDir, "${project.name}-${sourceSet.name}")
+        configuration.setStatusFlags(false, false, false, false)
+        configuration.parallelTesting = true
+        configuration.runWithJenkins = false
+
+        return configuration
     }
 
     @SuppressWarnings('ConfusingMethodName')
