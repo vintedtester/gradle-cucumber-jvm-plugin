@@ -31,7 +31,12 @@ to run up to 3 parallel forks. The *cucumberTest* source set will depend on the 
             maven {
                 url "http://repo.bodar.com"
             }
-            jcenter()
+            maven {
+              url "https://plugins.gradle.org/m2/"
+            }
+        }
+        dependencies {
+            classpath "com.commercehub:gradle-cucumber-jvm-plugin:0.7"
         }
     }
     plugins {
