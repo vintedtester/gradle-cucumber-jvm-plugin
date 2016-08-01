@@ -1,6 +1,7 @@
 package com.commercehub.gradle.cucumber
 
 import net.masterthought.cucumber.ReportBuilder
+import net.masterthought.cucumber.Configuration
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -11,9 +12,11 @@ import java.util.regex.Pattern
 class MasterThoughtReportGenerator implements ReportGenerator {
 
     CucumberTask parentTask
+    Configuration configuration
 
-    MasterThoughtReportGenerator(CucumberTask task) {
-        parentTask = task
+    MasterThoughtReportGenerator(CucumberTask parentTask, Configuration configuration) {
+        this.parentTask = parentTask
+        this.configuration = configuration
     }
 
     @Override
@@ -25,22 +28,9 @@ class MasterThoughtReportGenerator implements ReportGenerator {
 
         setJsonFileUriToRelativePaths(jsonReportFiles)
 
-        ReportBuilder reportBuilder = new ReportBuilder(
-                jsonReportFiles,
-                parentTask.reportsDir,
-                '',
-                '',
-                parentTask.project.name,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                true
-        )
+        ReportBuilder reportBuilder = new ReportBuilder(jsonReportFiles, configuration)
         reportBuilder.generateReports()
+
     }
 
     /**

@@ -15,7 +15,7 @@ class CucumberIntegrationSpec extends IntegrationSpec {
         copyResources('teststeps/TestSteps.groovy', 'src/test/groovy/cucumber/steps/TestSteps.groovy')
         buildFile << '''
             apply plugin: 'groovy'
-            apply plugin: 'cucumber-jvm'
+            apply plugin: 'com.commercehub.cucumber-jvm'
 
             addCucumberSuite 'test'
 
@@ -45,7 +45,8 @@ class CucumberIntegrationSpec extends IntegrationSpec {
         then:
         !result.wasUpToDate(':compileTestGroovy')
         result.wasExecuted(':test')
-        fileExists('build/reports/test/features-happypath-feature.html')
+        new File(projectDir, 'build/reports/test').list().flatten()*.replace('\\', '/')
+            .findResults { it.matches('features-happypath-feature_(feature)?\\.html') ? it : null } != null
     }
 
     def testFailingBackgroundStep() {
