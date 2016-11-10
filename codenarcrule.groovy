@@ -53,7 +53,7 @@ ruleset {
     IllegalClassReference {
         name = 'DoNotReferenceGradleApiInternals'
         priority = 1
-        classNames = 'org.gradle.*internal*'
+//        classNames = 'org.gradle.*internal*'
         applyToClassNames = '*'
         description = 'Do not reference Gradle API internals. These classes are not guaranteed to maintain compatibility between Gradle releases..'
     }

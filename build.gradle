@@ -29,7 +29,7 @@ dependencies {
     compile 'net.masterthought:cucumber-reporting:2.5.0'
 
     //testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
-    testCompile 'com.netflix.nebula:nebula-test:3.1.0'
+    testCompile 'com.netflix.nebula:nebula-test:4.2.2'
 
     //intTestCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
     integTestCompile 'com.netflix.nebula:nebula-test:3.1.0'
