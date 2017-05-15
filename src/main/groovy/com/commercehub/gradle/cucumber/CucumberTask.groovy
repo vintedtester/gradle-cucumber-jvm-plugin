@@ -136,8 +136,4 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     boolean getJunitReport() {
         return junitReport ?: extension.junitReport
     }
-
-    boolean getIgnoreFailures() {
-        return ignoreFailures ?: extension.ignoreFailures
-    }
 }
