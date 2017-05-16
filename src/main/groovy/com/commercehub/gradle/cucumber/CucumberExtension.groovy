@@ -55,6 +55,11 @@ class CucumberExtension {
      */
     boolean junitReport = false
 
+    /**
+     * Property to cause or prevent build failure when cucumber tests fail
+     */
+    boolean ignoreFailures = false
+
     private final Project project
 
     CucumberExtension(Project project) {

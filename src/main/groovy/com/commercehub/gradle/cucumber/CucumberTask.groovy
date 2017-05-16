@@ -29,6 +29,7 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     String snippets = null
     Map<String, String> systemProperties = [:]
     boolean junitReport = null
+    Boolean ignoreFailures = null
 
     @TaskAction
     void runTests() {
@@ -85,7 +86,11 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
         String reportUrl = new ConsoleRenderer().asClickableFileUrl(new File(reportsDir, 'feature-overview.html'))
         String message = "There were failing tests. See the report at: $reportUrl"
 
-        throw new GradleException(message)
+        if (ignoreFailures ?: extension.ignoreFailures) {
+            logger.warn(message)
+        } else {
+            throw new GradleException(message)
+        }
     }
 
     SourceSet getSourceSet() {
