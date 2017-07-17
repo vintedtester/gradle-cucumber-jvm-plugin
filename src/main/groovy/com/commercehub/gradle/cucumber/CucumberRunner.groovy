@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 @Slf4j
 class CucumberRunner {
     private static final String PLUGIN = '--plugin'
+    private static final String TILDE = '~'
 
     CucumberRunnerOptions options
     CucumberTestResultCounter testResultCounter
@@ -119,9 +120,27 @@ class CucumberRunner {
 
     protected void applyTagsArguments(List<String> args) {
         if (!options.tags.isEmpty()) {
-            args << '--tags'
-            args << options.tags.join(',')
+            applyTagsToCheck(args)
+            applyTagsToIgnore(args)
         }
+    }
+
+    private void applyTagsToCheck(List<String> args) {
+        def tagsToCheck = ''
+        options.tags.each {
+            if (!it.contains(TILDE)) {
+                tagsToCheck += it + ','
+            }
+        }
+        args << '--tags ' + tagsToCheck[0..-2]
+    }
+
+    private void applyTagsToIgnore(List<String> args) {
+        options.tags.each {
+                if (it.contains(TILDE)) {
+                    args << ' --tags ' + it
+                }
+            }
     }
 
     protected void applyStrictArguments(List<String> args) {
