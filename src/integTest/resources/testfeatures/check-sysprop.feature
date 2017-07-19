@@ -1,3 +1,4 @@
+@test
 Feature: Check that sys props are properly passed to the forked JVMs for tests
 
   @happypath

@@ -19,6 +19,9 @@ class CucumberIntegrationSpec extends IntegrationSpec {
 
             addCucumberSuite 'test'
 
+            cucumber {
+                tags = ["@test", "@happypath", "~@ignore"]
+            }
             repositories {
                 jcenter()
             }
@@ -65,6 +68,18 @@ class CucumberIntegrationSpec extends IntegrationSpec {
     def testSysProps() {
         given:
         copyResources('testfeatures/check-sysprop.feature', 'src/test/resources/features/check-sysprop.feature')
+
+        when:
+        ExecutionResult result = runTasksSuccessfully('test')
+        log.info(result.standardOutput)
+
+        then:
+        result.wasExecuted(':test')
+    }
+
+    def ignoreScenario() {
+        given:
+        copyResources('testfeatures/ignored-test.feature', 'src/test/resources/features/ignored-test.feature')
 
         when:
         ExecutionResult result = runTasksSuccessfully('test')

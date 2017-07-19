@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class CucumberRunner {
     private static final String PLUGIN = '--plugin'
     private static final String TILDE = '~'
+    private static final String TAGS = '--tags '
 
     CucumberRunnerOptions options
     CucumberTestResultCounter testResultCounter
@@ -127,20 +128,26 @@ class CucumberRunner {
 
     private void applyTagsToCheck(List<String> args) {
         def tagsToCheck = ''
+        def hasTags = false
         options.tags.each {
             if (!it.contains(TILDE)) {
                 tagsToCheck += it + ','
+                hasTags = true
             }
         }
-        args << '--tags ' + tagsToCheck[0..-2]
+        if (hasTags) {
+            args << TAGS
+            args << tagsToCheck[0..-2]
+        }
     }
 
     private void applyTagsToIgnore(List<String> args) {
         options.tags.each {
-                if (it.contains(TILDE)) {
-                    args << ' --tags ' + it
-                }
+            if (it.contains(TILDE)) {
+                args << TAGS
+                args << it
             }
+        }
     }
 
     protected void applyStrictArguments(List<String> args) {
