@@ -1,3 +1,4 @@
+@test
 Feature: Test Feature with broken background step
 
   Background: This will throw an exception
