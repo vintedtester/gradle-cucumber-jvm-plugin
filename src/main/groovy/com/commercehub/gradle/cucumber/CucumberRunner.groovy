@@ -22,6 +22,15 @@ class CucumberRunner {
     private static final String TILDE = '~'
     private static final String TAGS = '--tags '
 
+    /**
+     * Result files can be quite large when including embedded images, etc. When checking if a result file is empty,
+     * we don't want to process large files. A valid, empty result file is a JSON array and generally looks like
+     * "[ ]". It could have various whitespace around it or inside the brackets (spaces, newlines, etc.), so we'll
+     * pick a number sufficiently larger to account for that.
+     * Any file with a size of this or larger won't be considered when checking for an empty result.
+     */
+    private static final int EMPTY_RESULT_FILE_MAX_SIZE_IN_BYTES = 16
+
     CucumberRunnerOptions options
     CucumberTestResultCounter testResultCounter
     Map<String, String> systemProperties
@@ -67,7 +76,10 @@ class CucumberRunner {
                         .execute()
 
                 if (resultsFile.exists()) {
-                    handleResult(resultsFile, consoleOutLogFile, hasFeatureParseErrors, sourceSet)
+                    // if tags are used, they may exclude all features in a file, we don't want consider that an error
+                    if (options.tags.empty || !isResultFileEmpty(resultsFile)) {
+                        handleResult(resultsFile, consoleOutLogFile, hasFeatureParseErrors, sourceSet)
+                    }
                 } else {
                     hasFeatureParseErrors.set(true)
                     if (consoleErrLogFile.exists()) {
@@ -83,6 +95,10 @@ class CucumberRunner {
 
         testResultCounter.afterSuite()
         return !testResultCounter.hadFailures()
+    }
+
+    private boolean isResultFileEmpty(File resultsFile) {
+        resultsFile.size() < EMPTY_RESULT_FILE_MAX_SIZE_IN_BYTES && resultsFile.text.replaceAll(/\s+/, '') == '[]'
     }
 
     String getFeatureNameFromFile(File file, SourceSet sourceSet) {
