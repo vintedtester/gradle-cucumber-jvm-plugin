@@ -6,7 +6,7 @@ plugins {
     id 'maven-publish'
     id 'net.researchgate.release' version '2.1.2'
     id "com.jfrog.bintray" version "1.2"
-    id 'nebula.integtest' version '3.0.3'
+    id 'nebula.integtest' version '3.4.0'
     id 'com.gradle.plugin-publish' version '0.9.9'
 }
 
