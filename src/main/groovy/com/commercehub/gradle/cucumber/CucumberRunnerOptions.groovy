@@ -11,6 +11,8 @@ interface CucumberRunnerOptions {
 
     List<String> getFeatureRoots()
 
+    List<String> getPlugins()
+
     boolean getIsDryRun()
 
     boolean getIsMonochrome()

@@ -23,6 +23,7 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     Integer maxParallelForks = null
     List<String> featureRoots = null
     List<String> stepDefinitionRoots = null
+    List<String> plugins = null
     Boolean isDryRun = null
     Boolean isMonochrome = null
     Boolean isStrict = null
@@ -111,6 +112,11 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
 
     List<String> getFeatureRoots() {
         return featureRoots ?: extension.featureRoots
+    }
+
+    @Override
+    List<String> getPlugins() {
+        return plugins ?: extension.plugins
     }
 
     boolean getIsDryRun() {

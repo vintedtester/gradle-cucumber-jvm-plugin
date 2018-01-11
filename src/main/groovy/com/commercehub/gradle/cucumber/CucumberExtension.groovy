@@ -33,6 +33,11 @@ class CucumberExtension {
     /**
      *
      */
+    List<String> plugins = []
+
+    /**
+     *
+     */
     boolean isDryRun = false
 
     /**

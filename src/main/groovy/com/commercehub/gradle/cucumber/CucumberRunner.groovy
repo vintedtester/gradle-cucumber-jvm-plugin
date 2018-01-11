@@ -198,6 +198,12 @@ class CucumberRunner {
             args << PLUGIN
             args << "junit:${junitResultsFile.absolutePath}"
         }
+        if (!options.plugins.empty) {
+            options.plugins.each {
+                args << PLUGIN
+                args << it
+            }
+        }
     }
 
     protected List<String> applyGlueArguments(List<String> args) {
