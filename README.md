@@ -91,6 +91,37 @@ Running the following command will execute the test suite:
 
     gradle(w) cucumberTest
 
+### Using the Kotlin DSL
+
+Gradle also offers to use the new Kotlin DSL for build files.
+An example `build.gradle.kts` file might look like this:
+
+```kotlin
+plugins {
+    id("java")
+    id("com.commercehub.cucumber-jvm").version("0.13")
+}
+
+cucumber {
+    suite("cucumberTest")
+    maxParallelForks = 3
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    add("cucumberTestCompile", "info.cukes:cucumber-java:1.2.2")
+    add("cucumberTestCompile", "junit:junit:4.12")
+}
+```
+
+The main difference is that test suites need to be declared
+inside the `cucumber` extension. Also, the dependency syntax
+is different: dependencies of configurations need to be added
+via the `add()` function.
+
 ## Cucumber Task Configuration
 
 Cucumber tasks can be configured at two levels, globally for the project and individually for a test suite. This allows
@@ -100,10 +131,12 @@ property values form the project defaults. Both levels of configuration make the
 * `stepDefinitionRoots`: A list of root packages to scan the classpath for glue code. Defaults to `['cucumber.steps', 'cucumber.hooks']`.
 * `featureRoots`: A list of root packages to scan the resources folders on the classpath for feature files. Defaults to `['features']`.
 * `tags`: A list of tags to identify scenarios to run. Default to an empty list.
+* `plugins`: A list of cucumber plugins passed for execution. Defaults to an empty list.
 * `isStrict`: A boolean value indicating whether scenarios should be evaluated strictly. Defaults to `false`.
 * `snippits`: Indicator to cucumber on what style to use for generated step examples. Valid values include `camelcase`, `underscore`. Defaults to `camelcase`.
 * `maxParallelForks`: Maximum number of forked Java processes to start to run tests in parallel. Defaults to `1`.
 * `systemProperties`: Map of properties to values (String → String) to pass to the forked test running JVMs as Java system properties.
+* `suite("someName")`: Method to register a new suite. This can be used as an alternative to calling `addCucumberSuite()`. If you use the Kotlin DSL it is the only way to register a suite.
 
 ### Reporting
 

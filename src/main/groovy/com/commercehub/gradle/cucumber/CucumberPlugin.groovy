@@ -16,27 +16,31 @@ class CucumberPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
 
-        project.extensions.create('cucumber', CucumberExtension, project)
+        project.extensions.create('cucumber', CucumberExtension, project, this)
         project.metaClass.addCucumberSuite = { String sourceSetName ->
-            SourceSet cucumberSuiteSourceSet =
-                    project.sourceSets.findByName(sourceSetName) ?: project.sourceSets.create(sourceSetName) {
-                        compileClasspath += project.sourceSets[DEFAULT_PARENT_SOURCESET].output
-                        compileClasspath += project.sourceSets[DEFAULT_PARENT_SOURCESET].compileClasspath
-                        runtimeClasspath = it.output + it.compileClasspath
-                    }
-            CucumberTask task = project.tasks.replace(sourceSetName, CucumberTask)
-            task.dependsOn cucumberSuiteSourceSet.classesTaskName
-            task.sourceSet = cucumberSuiteSourceSet
-
-            // configure source set in intellij if plugin is applied
-            project.plugins.withType(IdeaPlugin) {
-                project.idea.module {
-                    testSourceDirs += cucumberSuiteSourceSet.allSource.srcDirs
-                    testSourceDirs += cucumberSuiteSourceSet.resources.srcDirs
-                }
-            }
-
-            return cucumberSuiteSourceSet
+            addSuite(sourceSetName, project)
         }
+    }
+
+    def addSuite(String sourceSetName, Project project) {
+        SourceSet cucumberSuiteSourceSet =
+                project.sourceSets.findByName(sourceSetName) ?: project.sourceSets.create(sourceSetName) {
+                    compileClasspath += project.sourceSets[DEFAULT_PARENT_SOURCESET].output
+                    compileClasspath += project.sourceSets[DEFAULT_PARENT_SOURCESET].compileClasspath
+                    runtimeClasspath = it.output + it.compileClasspath
+                }
+        CucumberTask task = project.tasks.replace(sourceSetName, CucumberTask)
+        task.dependsOn cucumberSuiteSourceSet.classesTaskName
+        task.sourceSet = cucumberSuiteSourceSet
+
+        // configure source set in intellij if plugin is applied
+        project.plugins.withType(IdeaPlugin) {
+            project.idea.module {
+                testSourceDirs += cucumberSuiteSourceSet.allSource.srcDirs
+                testSourceDirs += cucumberSuiteSourceSet.resources.srcDirs
+            }
+        }
+
+        return cucumberSuiteSourceSet
     }
 }

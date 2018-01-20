@@ -33,6 +33,11 @@ class CucumberExtension {
     /**
      *
      */
+    List<String> plugins = []
+
+    /**
+     *
+     */
     boolean isDryRun = false
 
     /**
@@ -62,8 +67,11 @@ class CucumberExtension {
 
     private final Project project
 
-    CucumberExtension(Project project) {
+    private final CucumberPlugin plugin
+
+    CucumberExtension(Project project, CucumberPlugin plugin) {
         this.project = project
+        this.plugin = plugin
     }
 
     def cucumber(Closure closure) {
@@ -86,5 +94,14 @@ class CucumberExtension {
                     "You provided: ${snippets}")
         }
         this.snippets = snippets
+    }
+
+    /**
+     * Register a new Cucumber suite in the project.
+     *
+     * @param name The name of the suite, e.g. "cucumberTest".
+     */
+    void suite(String name) {
+        plugin.addSuite(name, project)
     }
 }

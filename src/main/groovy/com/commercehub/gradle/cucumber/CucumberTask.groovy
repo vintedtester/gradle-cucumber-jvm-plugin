@@ -23,6 +23,7 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     Integer maxParallelForks = null
     List<String> featureRoots = null
     List<String> stepDefinitionRoots = null
+    List<String> plugins = null
     Boolean isDryRun = null
     Boolean isMonochrome = null
     Boolean isStrict = null
@@ -35,7 +36,7 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     void runTests() {
         ProgressLoggerFactory progressLoggerFactory = services.get(ProgressLoggerFactory)
         CucumberRunner runner = new CucumberRunner(this, configuration,
-                new CucumberTestResultCounter(progressLoggerFactory, logger), systemProperties)
+                new CucumberTestResultCounter(progressLoggerFactory, logger), systemProperties, logger)
         boolean isPassing = runner.run(sourceSet, resultsDir, reportsDir)
         new MasterThoughtReportGenerator(this, configuration).generateReport(jsonReportFiles)
 
@@ -111,6 +112,11 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
 
     List<String> getFeatureRoots() {
         return featureRoots ?: extension.featureRoots
+    }
+
+    @Override
+    List<String> getPlugins() {
+        return plugins ?: extension.plugins
     }
 
     boolean getIsDryRun() {

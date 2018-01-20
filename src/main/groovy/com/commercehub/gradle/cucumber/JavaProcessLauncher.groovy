@@ -1,6 +1,9 @@
 package com.commercehub.gradle.cucumber
 
 import groovy.util.logging.Slf4j
+import org.apache.tools.ant.util.TeeOutputStream
+import org.gradle.api.logging.LogLevel
+import org.gradle.api.logging.Logger
 import org.zeroturnaround.exec.ProcessExecutor
 
 /**
@@ -14,6 +17,7 @@ class JavaProcessLauncher {
     File consoleOutLogFile
     File consoleErrLogFile
     Map<String, String> systemProperties = [:]
+    Logger gradleLogger
 
     JavaProcessLauncher(String mainClassName, List<File> classpath) {
         this.mainClassName = mainClassName
@@ -40,6 +44,11 @@ class JavaProcessLauncher {
         return this
     }
 
+    JavaProcessLauncher setGradleLogger(Logger gradleLogger) {
+        this.gradleLogger = gradleLogger
+        return this
+    }
+
     int execute() {
         List<String> command = []
         command << javaCommand
@@ -54,14 +63,47 @@ class JavaProcessLauncher {
         command.addAll(args)
 
         ProcessExecutor processExecutor = new ProcessExecutor().command(command)
-        if (consoleOutLogFile) {
-            processExecutor.redirectOutput(consoleOutLogFile.newOutputStream())
+
+        LoggingOutputStream infoOutputStream = gradleLogger ?
+                new LoggingOutputStream(gradleLogger, LogLevel.INFO) : null
+        OutputStream consoleOutputStream = consoleOutLogFile ?
+                consoleOutLogFile.newOutputStream() : null
+        OutputStream stdout = combineOutputStreams(infoOutputStream, consoleOutputStream)
+        if (stdout) {
+            processExecutor.redirectOutput(stdout)
         }
-        if (consoleErrLogFile) {
-            processExecutor.redirectError(consoleErrLogFile.newDataOutputStream())
+
+        LoggingOutputStream errorOutputStream = gradleLogger ?
+                new LoggingOutputStream(gradleLogger, LogLevel.ERROR) : null
+        OutputStream consoleErrorStream = consoleErrLogFile ?
+                consoleErrLogFile.newOutputStream() : null
+        OutputStream stderr = combineOutputStreams(errorOutputStream, consoleErrorStream)
+        if (stderr) {
+            processExecutor.redirectError(stderr)
         }
-        log.debug("Running command [${command.join(' ')}]")
-        return processExecutor.destroyOnExit().execute().exitValue
+
+        try {
+            log.debug("Running command [${command.join(' ')}]")
+            return processExecutor.destroyOnExit().execute().exitValue
+        } finally {
+            stdout?.close()
+            stderr?.close()
+        }
+    }
+
+    /**
+     * Returns an output stream that sends output to both streams. If either stream is null, the other is
+     * returned. If both are null, null is returned.
+     * @return OutputStream, may be null.
+     */
+    private static OutputStream combineOutputStreams(OutputStream left, OutputStream right) {
+        if (left == null) {
+            return right
+        }
+        if (right == null) {
+            return left
+        }
+        return new TeeOutputStream(left, right)
     }
 
     String getClassPathAsString() {

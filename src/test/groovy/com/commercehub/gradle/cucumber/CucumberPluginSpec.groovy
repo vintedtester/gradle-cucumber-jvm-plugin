@@ -29,6 +29,20 @@ class CucumberPluginSpec extends PluginProjectSpec {
         project.tasks.findByName(suiteName).sourceSet == project.sourceSets.findByName(suiteName)
     }
 
+    def testAddCucumberSuiteForExistingSourceSetWhenCreatedInExtension() {
+        final String suiteName = 'myTest'
+
+        when:
+        project.apply(plugin: 'java')
+        project.apply(plugin: pluginName)
+        project.sourceSets.create(suiteName)
+        project.cucumber.suite(suiteName)
+
+        then:
+        project.tasks.findByName(suiteName)
+        project.tasks.findByName(suiteName).sourceSet == project.sourceSets.findByName(suiteName)
+    }
+
     def testAddCucumberSuiteCanCreateSourceSet() {
         final String suiteName = 'myNewTest'
 
@@ -42,6 +56,19 @@ class CucumberPluginSpec extends PluginProjectSpec {
         project.tasks.findByName(suiteName).sourceSet == project.sourceSets.findByName(suiteName)
     }
 
+    def testAddCucumberSuiteCanCreateSourceSetWhenCreatedInExtension() {
+        final String suiteName = 'myNewTest'
+
+        when:
+        project.apply(plugin: 'java')
+        project.apply(plugin: pluginName)
+        project.cucumber.suite(suiteName)
+
+        then:
+        project.tasks.findByName(suiteName)
+        project.tasks.findByName(suiteName).sourceSet == project.sourceSets.findByName(suiteName)
+    }
+
     def testAddCucumberSuiteCanTakeOverTestSourceSet() {
         final String suiteName = 'test'
 
@@ -49,6 +76,18 @@ class CucumberPluginSpec extends PluginProjectSpec {
         project.apply(plugin: 'java')
         project.apply(plugin: pluginName)
         project.addCucumberSuite(suiteName)
+
+        then:
+        project.tasks.findByName(suiteName) instanceof CucumberTask
+    }
+
+    def testAddCucumberSuiteCanTakeOverTestSourceSetWhenCreatedInExtension() {
+        final String suiteName = 'test'
+
+        when:
+        project.apply(plugin: 'java')
+        project.apply(plugin: pluginName)
+        project.cucumber.suite(suiteName)
 
         then:
         project.tasks.findByName(suiteName) instanceof CucumberTask

@@ -7,6 +7,7 @@ import net.masterthought.cucumber.ReportParser
 import net.masterthought.cucumber.json.Feature
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileTree
+import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.SourceSet
 
 import java.nio.file.Path
@@ -35,13 +36,16 @@ class CucumberRunner {
     CucumberTestResultCounter testResultCounter
     Map<String, String> systemProperties
     Configuration configuration
+    Logger gradleLogger
 
     CucumberRunner(CucumberRunnerOptions options, Configuration configuration,
-                   CucumberTestResultCounter testResultCounter, Map<String, String> systemProperties) {
+                   CucumberTestResultCounter testResultCounter, Map<String, String> systemProperties,
+                   Logger gradleLogger) {
         this.options = options
         this.testResultCounter = testResultCounter
         this.configuration = configuration
         this.systemProperties = systemProperties
+        this.gradleLogger = gradleLogger
     }
 
     boolean run(SourceSet sourceSet, File resultsDir, File reportsDir) {
@@ -73,6 +77,7 @@ class CucumberRunner {
                         .setConsoleOutLogFile(consoleOutLogFile)
                         .setConsoleErrLogFile(consoleErrLogFile)
                         .setSystemProperties(systemProperties)
+                        .setGradleLogger(gradleLogger)
                         .execute()
 
                 if (resultsFile.exists()) {
@@ -186,10 +191,18 @@ class CucumberRunner {
 
     protected void applyPluginArguments(List<String> args, File resultsFile, File junitResultsFile) {
         args << PLUGIN
+        args << 'pretty'
+        args << PLUGIN
         args << "json:${resultsFile.absolutePath}"
         if (options.junitReport) {
             args << PLUGIN
             args << "junit:${junitResultsFile.absolutePath}"
+        }
+        if (!options.plugins.empty) {
+            options.plugins.each {
+                args << PLUGIN
+                args << it
+            }
         }
     }
 
