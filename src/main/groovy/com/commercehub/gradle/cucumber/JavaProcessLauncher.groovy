@@ -14,6 +14,7 @@ class JavaProcessLauncher {
     String mainClassName
     List<File> classpath
     List<String> args = []
+    List<String> jvmArgs = []
     File consoleOutLogFile
     File consoleErrLogFile
     Map<String, String> systemProperties = [:]
@@ -26,6 +27,11 @@ class JavaProcessLauncher {
 
     JavaProcessLauncher setArgs(List<String> args) {
         this.args = args*.toString()
+        return this
+    }
+
+    JavaProcessLauncher setJvmArgs(List<String> jvmArgs) {
+        this.jvmArgs = jvmArgs*.toString()
         return this
     }
 
@@ -55,8 +61,13 @@ class JavaProcessLauncher {
         command << '-cp'
         command << classPathAsString
         if (!systemProperties.isEmpty()) {
-            systemProperties.keySet().each { key ->
-                command << "-D${key}=${systemProperties.get(key)}".toString()
+            systemProperties.each { key, value ->
+                command << "-D${key}=${value}".toString()
+            }
+        }
+        if(!jvmArgs.empty) {
+            jvmArgs.each {
+                command << it
             }
         }
         command << mainClassName

@@ -135,6 +135,7 @@ property values form the project defaults. Both levels of configuration make the
 * `isStrict`: A boolean value indicating whether scenarios should be evaluated strictly. Defaults to `false`.
 * `snippits`: Indicator to cucumber on what style to use for generated step examples. Valid values include `camelcase`, `underscore`. Defaults to `camelcase`.
 * `maxParallelForks`: Maximum number of forked Java processes to start to run tests in parallel. Defaults to `1`.
+* `jvmArgs`: List of custom jvm arguments to pass to test execution
 * `systemProperties`: Map of properties to values (String → String) to pass to the forked test running JVMs as Java system properties.
 * `suite("someName")`: Method to register a new suite. This can be used as an alternative to calling `addCucumberSuite()`. If you use the Kotlin DSL it is the only way to register a suite.
 

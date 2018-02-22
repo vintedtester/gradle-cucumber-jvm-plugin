@@ -28,6 +28,7 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     Boolean isMonochrome = null
     Boolean isStrict = null
     String snippets = null
+    List<String> jvmArgs = []
     Map<String, String> systemProperties = [:]
     boolean junitReport = null
     Boolean ignoreFailures = null
@@ -36,7 +37,7 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     void runTests() {
         ProgressLoggerFactory progressLoggerFactory = services.get(ProgressLoggerFactory)
         CucumberRunner runner = new CucumberRunner(this, configuration,
-                new CucumberTestResultCounter(progressLoggerFactory, logger), systemProperties, logger)
+                new CucumberTestResultCounter(progressLoggerFactory, logger), jvmArgs, systemProperties, logger)
         boolean isPassing = runner.run(sourceSet, resultsDir, reportsDir)
         new MasterThoughtReportGenerator(this, configuration).generateReport(jsonReportFiles)
 
