@@ -34,16 +34,18 @@ class CucumberRunner {
 
     CucumberRunnerOptions options
     CucumberTestResultCounter testResultCounter
+    List<String> jvmArgs
     Map<String, String> systemProperties
     Configuration configuration
     Logger gradleLogger
 
     CucumberRunner(CucumberRunnerOptions options, Configuration configuration,
-                   CucumberTestResultCounter testResultCounter, Map<String, String> systemProperties,
+                   CucumberTestResultCounter testResultCounter, List<String> jvmArgs, Map<String, String> systemProperties,
                    Logger gradleLogger) {
         this.options = options
         this.testResultCounter = testResultCounter
         this.configuration = configuration
+        this.jvmArgs = jvmArgs
         this.systemProperties = systemProperties
         this.gradleLogger = gradleLogger
     }
@@ -74,6 +76,7 @@ class CucumberRunner {
 
                 new JavaProcessLauncher('cucumber.api.cli.Main', sourceSet.runtimeClasspath.toList())
                         .setArgs(args)
+                        .setJvmArgs(jvmArgs)
                         .setConsoleOutLogFile(consoleOutLogFile)
                         .setConsoleErrLogFile(consoleErrLogFile)
                         .setSystemProperties(systemProperties)
