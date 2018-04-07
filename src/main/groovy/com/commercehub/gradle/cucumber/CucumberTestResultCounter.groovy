@@ -2,7 +2,7 @@ package com.commercehub.gradle.cucumber
 
 import org.gradle.internal.logging.progress.ProgressLogger
 import org.gradle.internal.logging.progress.ProgressLoggerFactory
-import org.slf4j.Logger
+import org.gradle.api.logging.Logger
 
 /**
  * Created by jgelais on 6/18/15.

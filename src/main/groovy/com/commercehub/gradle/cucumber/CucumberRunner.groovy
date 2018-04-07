@@ -39,8 +39,10 @@ class CucumberRunner {
     Configuration configuration
     Logger gradleLogger
 
+    @SuppressWarnings('ParameterCount')
     CucumberRunner(CucumberRunnerOptions options, Configuration configuration,
-                   CucumberTestResultCounter testResultCounter, List<String> jvmArgs, Map<String, String> systemProperties,
+                   CucumberTestResultCounter testResultCounter,
+                   List<String> jvmArgs, Map<String, String> systemProperties,
                    Logger gradleLogger) {
         this.options = options
         this.testResultCounter = testResultCounter

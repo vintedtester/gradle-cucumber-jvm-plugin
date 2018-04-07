@@ -26,7 +26,7 @@ class MasterThoughtReportGenerator implements ReportGenerator {
             jsonReportFiles << it.absolutePath
         }
 
-        setJsonFileUriToRelativePaths(jsonReportFiles)
+        jsonFileUriToRelativePaths = jsonReportFiles
 
         ReportBuilder reportBuilder = new ReportBuilder(jsonReportFiles, configuration)
         reportBuilder.generateReports()

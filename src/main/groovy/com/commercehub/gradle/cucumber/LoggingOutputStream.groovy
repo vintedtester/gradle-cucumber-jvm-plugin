@@ -40,11 +40,12 @@ class LoggingOutputStream extends OutputStream implements Closeable {
                     }
                 } catch (InterruptedException e) {
                     // expected when closing the output stream and we're blocking on the queue
+                    logger.debug("${name} interrupted", e)
                 }
             }
         }
-        thread.setDaemon(true)
-        thread.setPriority(Thread.MIN_PRIORITY)
+        thread.daemon = true
+        thread.priority = Thread.MIN_PRIORITY
         thread.start()
     }
 
@@ -106,7 +107,7 @@ class LoggingOutputStream extends OutputStream implements Closeable {
 
     @Override
     void close() throws IOException {
-        if (thread.getState() == Thread.State.TERMINATED) {
+        if (thread.state == Thread.State.TERMINATED) {
             return
         }
 
@@ -120,10 +121,11 @@ class LoggingOutputStream extends OutputStream implements Closeable {
         thread.interrupt()
     }
 
+    @SuppressWarnings('ThreadYield')
     void waitForEmpty(int timeout = 5000) {
         long end = System.currentTimeMillis() + timeout
         while (System.currentTimeMillis() < end &&
-                (thread.getState() in [Thread.State.NEW, Thread.State.RUNNABLE] || !queue.isEmpty())) {
+                (thread.state in [Thread.State.NEW, Thread.State.RUNNABLE] || !queue.isEmpty())) {
             Thread.yield()
             Thread.sleep(200)
         }

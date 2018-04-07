@@ -64,7 +64,7 @@ class JavaProcessLauncher {
                 command << "-D${key}=${value}".toString()
             }
         }
-        if(!jvmArgs.empty) {
+        if (!jvmArgs.empty) {
             jvmArgs.each {
                 command << it
             }

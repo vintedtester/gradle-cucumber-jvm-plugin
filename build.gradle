@@ -1,13 +1,14 @@
 plugins {
     id 'groovy'
     id 'codenarc'
-    id 'net.saliman.cobertura' version '2.2.8'
+    id 'net.saliman.cobertura' version '2.5.4'
     id 'idea'
     id 'maven-publish'
-    id 'net.researchgate.release' version '2.1.2'
-    id "com.jfrog.bintray" version "1.2"
-    id 'nebula.integtest' version '3.4.0'
-    id 'com.gradle.plugin-publish' version '0.9.9'
+    id 'net.researchgate.release' version '2.6.0'
+    id "com.jfrog.bintray" version "1.8.0"
+    id 'nebula.integtest' version '3.4.1'
+    id 'com.gradle.plugin-publish' version '0.9.10'
+    id 'com.github.ben-manes.versions' version '0.17.0'
 }
 
 sourceCompatibility = 1.7
@@ -25,26 +26,22 @@ dependencies {
     compile gradleApi()
 
     compile 'org.codehaus.gpars:gpars:1.2.1'
-    compile 'org.zeroturnaround:zt-exec:1.8'
-    compile 'net.masterthought:cucumber-reporting:3.2.0'
+    compile 'org.zeroturnaround:zt-exec:1.10'
+    compile 'net.masterthought:cucumber-reporting:3.16.0'
 
     //testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
-    testCompile 'com.netflix.nebula:nebula-test:4.2.2'
+    testCompile "org.codehaus.groovy:groovy-all:2.4.12"
+    testCompile 'com.netflix.nebula:nebula-test:6.3.0'
 
     //intTestCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
-    integTestCompile 'com.netflix.nebula:nebula-test:3.1.0'
-}
-
-sourceSets {
-    test {
-        //remove incompatible jar from test class path
-        runtimeClasspath = runtimeClasspath.minus files("$gradle.gradleHomeDir/lib/commons-io-1.4.jar")
-    }
+    integTestCompile 'com.netflix.nebula:nebula-test:6.3.0'
 }
 
 codenarc {
     configFile = rootProject.file('codenarcrule.groovy')
     reportFormat = System.properties['codeNarcOutput'] ?: 'html'
+    maxPriority2Violations = Integer.MAX_VALUE
+    maxPriority3Violations = Integer.MAX_VALUE
 }
 
 cobertura {
@@ -86,10 +83,6 @@ publishing {
 
             artifact javadocJar {
                 classifier "javadoc"
-            }
-
-            pom.withXml {
-                def Node root = asNode()
             }
         }
     }
