@@ -8,6 +8,7 @@ plugins {
     id "com.jfrog.bintray" version "1.8.0"
     id 'nebula.integtest' version '3.4.1'
     id 'com.gradle.plugin-publish' version '0.9.10'
+    id 'com.github.johnrengelman.plugin-shadow' version '2.0.3'
     id 'com.github.ben-manes.versions' version '0.17.0'
 }
 
@@ -22,19 +23,67 @@ repositories {
     jcenter()
 }
 
-dependencies {
-    compile gradleApi()
+/*
+ * Gradle leaks dependencies into the plugin. Sometimes the plugin gets an incompatible version.
+ * For example, with Gradle 4, commons-io is a 1.x version, whereas this plugin needs 2.x. The
+ * shadow plugin copies dependencies into the JAR file and repackages them to avoid this problem.
+ * We don't want to do all of the dependencies. Some do not work when shadowed, and it makes the
+ * plugin JAR large. The following list are dependencies to exclude from shadowing. They must
+ * include all dependencies that are excluded by 'shadowJar.dependencies.exclude'. We cannot use
+ * this list in the 'exclude' calls, because 'shadowJar.dependencies.exclude' needs to consider
+ * transitive dependencies, the follow list should not include transitive.
+ */
+def shadowExcludeDependencies = [
+    'org.codehaus.gpars:gpars:1.2.1',
+    'org.zeroturnaround:zt-exec:1.10',
+    'org.apache.logging.log4j:log4j-core:2.8.2',
+    'org.apache.logging.log4j:log4j-api:2.8.2',
+    'com.fasterxml.jackson.core:jackson-databind:2.8.6',
+    'org.apache.velocity:velocity:1.7',
+    'velocity-tools:velocity-tools:1.4',
+    'joda-time:joda-time:2.9.9',
+    'net.lingala.zip4j:zip4j:1.3.2',
+    'org.codehaus.plexus:plexus-utils:3.0.24',
+    'org.jsoup:jsoup:1.10.3',
+    'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20170515.1',
+    'com.google.guava:guava:20.0'
+]
 
-    compile 'org.codehaus.gpars:gpars:1.2.1'
-    compile 'org.zeroturnaround:zt-exec:1.10'
-    compile 'net.masterthought:cucumber-reporting:3.16.0'
+dependencies {
+    shadow gradleApi()
+
+    compile('net.masterthought:cucumber-reporting:3.16.0') {
+        shadowExcludeDependencies.each {
+            def split = it.split(':')
+            exclude(group: split[0], module: split[1])
+        }
+    }
+    shadow(shadowExcludeDependencies)
 
     //testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+    testCompile gradleApi()
+    testCompile shadowExcludeDependencies
     testCompile "org.codehaus.groovy:groovy-all:2.4.12"
     testCompile 'com.netflix.nebula:nebula-test:6.3.0'
 
     //intTestCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+    integTestCompile gradleApi()
+    integTestCompile shadowExcludeDependencies
     integTestCompile 'com.netflix.nebula:nebula-test:6.3.0'
+}
+
+configureRelocationShadowJar {
+    prefix = 'com.commercehub.gradle.cucumber.shadow'
+}
+
+shadowJar {
+    dependencies {
+        exclude(dependency {
+            // net.masterthought:cucumber-reporting MUST be shadowed so it will reference the shadowed JARs.
+            // We'll shadow all commons dependencies, they are likely to be used in Gradle.
+            !it.moduleGroup.contains('commons') && it.moduleGroup != 'net.masterthought'
+        })
+    }
 }
 
 codenarc {
@@ -74,8 +123,8 @@ artifacts {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            from components.java
+        mavenJava(MavenPublication) { publication ->
+            project.shadow.component(publication)
 
             artifact sourcesJar {
                 classifier "sources"
@@ -93,13 +142,19 @@ bintray {
     key = project.hasProperty("bintrayApiKey") ? bintrayApiKey : null
     publications = ["mavenJava"]
     pkg {
-        repo = "main"
-        userOrg = "commercehub-oss"
+        repo = project.hasProperty("bintrayRepo") ? bintrayRepo : "main"
+        userOrg = project.hasProperty("bintrayUserOrg") ? bintrayUserOrg : "commercehub-oss"
         name = 'gradle-cucumber-jvm-plugin'
         licenses = ["Apache-2.0"]
         vcsUrl = 'https://github.com/commercehub-oss/gradle-cucumber-jvm-plugin'
     }
 }
+
+jar {
+    enabled = false
+    dependsOn(shadowJar { classifier = null })
+}
+
 bintrayUpload.dependsOn build, sourcesJar, javadocJar
 createReleaseTag.dependsOn bintrayUpload
 createReleaseTag.dependsOn publishPlugins
