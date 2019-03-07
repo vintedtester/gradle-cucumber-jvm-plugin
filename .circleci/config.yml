@@ -1,0 +1,46 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/gradle-cucumber-jvm-plugin
+    environment:
+      - TERM=dumb
+      # from plugins.gradle.org:
+      #- ORG_GRADLE_PROJECT_GRADLE_PUBLISH_KEY=
+      #- ORG_GRADLE_PROJECT_GRADLE_PUBLISH_SECRET=
+    docker:
+      - image: openjdk:8u181-jdk
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - gradle-cucumber-jvm-plugin-{{ .Branch }}-{{ checksum "build.gradle" }}
+            - gradle-cucumber-jvm-plugin-{{ .Branch }}
+            - gradle-cucumber-jvm-plugin-
+
+      - run:
+          name: Run Checks
+          command: ./gradlew check --stacktrace
+      - store_test_results:
+          path: ./build/test-results
+      - store_artifacts:
+          path: ./build/reports/clover
+          destination: coverage
+
+      - deploy:
+          name: Deploy to Gradle Plugins
+          command: |
+            if [[ "${CIRCLE_TAG}" =~ ^[0-9][0-9.]*$ ]]; then
+              ./gradlew publishPlugins
+            fi
+
+      - save_cache:
+          key: gradle-cucumber-jvm-plugin-{{ .Branch }}-{{ checksum "build.gradle" }}
+          paths:
+            - "~/.gradle"
+
+# https://discuss.circleci.com/t/git-tag-deploys-in-2-0/9493/6
+deployment:
+  fake_deploy_for_cci2:
+    tag: /.*/
+    commands:
+      - echo "make tags run in 2.0"

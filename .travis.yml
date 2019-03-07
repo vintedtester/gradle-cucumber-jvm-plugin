@@ -1,6 +1,0 @@
-language: java
-env:
-  global:
-  - TERM=dumb
-install: true
-script: ./gradlew build --stacktrace

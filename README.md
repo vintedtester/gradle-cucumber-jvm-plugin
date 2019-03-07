@@ -36,12 +36,12 @@ buildscript {
         }
     }
     dependencies {
-        classpath "com.commercehub:gradle-cucumber-jvm-plugin:0.15"
+        classpath "com.patdouble:gradle-cucumber-jvm-plugin:0.16"
     }
 }
 plugins {
     id 'java'
-    id 'com.commercehub.cucumber-jvm' version '0.15'
+    id 'com.patdouble.cucumber-jvm' version '0.16'
 }
 
   
@@ -99,7 +99,7 @@ An example `build.gradle.kts` file might look like this:
 ```kotlin
 plugins {
     id("java")
-    id("com.commercehub.cucumber-jvm").version("0.15")
+    id("com.patdouble.cucumber-jvm").version("0.16")
 }
 
 cucumber {

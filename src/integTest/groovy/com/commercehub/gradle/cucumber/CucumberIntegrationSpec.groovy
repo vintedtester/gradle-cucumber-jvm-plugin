@@ -15,7 +15,7 @@ class CucumberIntegrationSpec extends IntegrationSpec {
         copyResources('teststeps/TestSteps.groovy', 'src/test/groovy/cucumber/steps/TestSteps.groovy')
         buildFile << '''
             apply plugin: 'groovy'
-            apply plugin: 'com.commercehub.cucumber-jvm'
+            apply plugin: 'com.patdouble.cucumber-jvm'
 
             addCucumberSuite 'test'
 
