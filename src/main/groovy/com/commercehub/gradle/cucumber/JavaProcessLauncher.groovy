@@ -1,6 +1,5 @@
 package com.commercehub.gradle.cucumber
 
-import groovy.util.logging.Slf4j
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logger
 import org.zeroturnaround.exec.ProcessExecutor
@@ -8,7 +7,6 @@ import org.zeroturnaround.exec.ProcessExecutor
 /**
  * Created by jgelais on 6/17/15.
  */
-@Slf4j
 class JavaProcessLauncher {
     String mainClassName
     List<File> classpath
@@ -97,9 +95,10 @@ class JavaProcessLauncher {
                 OutputStream err = new LoggingOutputStream(gradleLogger, LogLevel.ERROR)
                 streams << err
                 processExecutor.redirectErrorAlsoTo(err)
+
+                gradleLogger.debug("Running command [${command.join(' ')}]")
             }
 
-            log.debug("Running command [${command.join(' ')}]")
             return processExecutor.destroyOnExit().execute().exitValue
         } finally {
             streams*.close()

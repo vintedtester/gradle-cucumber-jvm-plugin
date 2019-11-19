@@ -1,6 +1,5 @@
 package com.commercehub.gradle.cucumber
 
-import groovy.util.logging.Slf4j
 import groovyx.gpars.GParsPool
 import net.masterthought.cucumber.Configuration
 import net.masterthought.cucumber.ReportParser
@@ -17,7 +16,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 /**
  * Created by jgelais on 6/16/15.
  */
-@Slf4j
 class CucumberRunner {
     private static final String PLUGIN = '--plugin'
     private static final String TILDE = '~'
@@ -94,7 +92,7 @@ class CucumberRunner {
                 } else {
                     hasFeatureParseErrors.set(true)
                     if (consoleErrLogFile.exists()) {
-                        log.error(consoleErrLogFile.text)
+                        gradleLogger.error(consoleErrLogFile.text)
                     }
                 }
             }
@@ -231,7 +229,7 @@ class CucumberRunner {
     private void handleResult(File resultsFile, File consoleOutLogFile,
                               AtomicBoolean hasFeatureParseErrors, SourceSet sourceSet) {
         List<CucumberFeatureResult> results = parseFeatureResult(resultsFile).collect {
-            log.debug("Logging result for $it.name")
+            gradleLogger.debug("Logging result for $it.name")
             createResult(it)
         }
         results.each { CucumberFeatureResult result ->
@@ -241,7 +239,7 @@ class CucumberRunner {
                 if (result.undefinedSteps > 0) {
                     hasFeatureParseErrors.set(true)
                 }
-                log.error('{}:\r\n {}', sourceSet.name, consoleOutLogFile.text)
+                gradleLogger.error('{}:\r\n {}', sourceSet.name, consoleOutLogFile.text)
             }
         }
     }
