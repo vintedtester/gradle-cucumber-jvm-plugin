@@ -56,6 +56,7 @@ class CucumberRunner {
         AtomicBoolean hasFeatureParseErrors = new AtomicBoolean(false)
 
         def features = findFeatures(sourceSet)
+        def classpath = sourceSet.runtimeClasspath.toList()
 
         testResultCounter.beforeSuite(features.files.size())
         GParsPool.withPool(options.maxParallelForks) {
@@ -76,7 +77,7 @@ class CucumberRunner {
                 applySnippetArguments(args)
                 args << featureFile.absolutePath
 
-                new JavaProcessLauncher('cucumber.api.cli.Main', sourceSet.runtimeClasspath.toList())
+                new JavaProcessLauncher('cucumber.api.cli.Main', classpath)
                         .setArgs(args)
                         .setJvmArgs(jvmArgs)
                         .setConsoleOutLogFile(consoleOutLogFile)
