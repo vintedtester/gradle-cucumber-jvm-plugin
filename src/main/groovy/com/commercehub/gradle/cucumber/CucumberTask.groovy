@@ -105,7 +105,7 @@ class CucumberTask extends Test implements CucumberRunnerOptions {
     }
 
     private void handleTestFailures() {
-        String reportUrl = new ConsoleRenderer().asClickableFileUrl(new File(getReportsDir(), 'cucumber-html-reports/feature-overview.html'))
+        String reportUrl = new ConsoleRenderer().asClickableFileUrl(new File(getReportsDir(), 'cucumber-html-reports/overview-failures.html'))
         String message = "There were failing tests. See the report at: $reportUrl"
 
         if (ignoreFailures ?: extension.ignoreFailures) {

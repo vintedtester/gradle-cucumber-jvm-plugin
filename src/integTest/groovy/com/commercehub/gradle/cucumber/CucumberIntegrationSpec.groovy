@@ -3,7 +3,6 @@ package com.commercehub.gradle.cucumber
 import groovy.util.logging.Slf4j
 import nebula.test.IntegrationSpec
 import nebula.test.functional.ExecutionResult
-import org.gradle.api.GradleException
 
 /**
  * Created by jgelais on 11/19/15.
@@ -68,11 +67,12 @@ class CucumberIntegrationSpec extends IntegrationSpec {
                 'src/test/resources/features/failing-background-test.feature')
 
         when:
-        ExecutionResult result = runTasksSuccessfully('test')
+        ExecutionResult result = runTasksWithFailure('test')
         log.info(result.standardOutput)
 
         then:
-        thrown GradleException
+        fileExists('build/reports/test/cucumber-html-reports/overview-failures.html')
+        result.standardError.contains("build/reports/test/cucumber-html-reports/overview-failures.html")
     }
 
     def testSysProps() {
