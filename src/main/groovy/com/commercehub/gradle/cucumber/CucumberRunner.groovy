@@ -12,6 +12,8 @@ import org.gradle.api.tasks.SourceSet
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.jar.JarEntry
+import java.util.jar.JarInputStream
 
 /**
  * Created by jgelais on 6/16/15.
@@ -20,6 +22,9 @@ class CucumberRunner {
     private static final String PLUGIN = '--plugin'
     private static final String TILDE = '~'
     private static final String TAGS = '--tags '
+
+    private static final String CUCUMBER_MAIN_NEW = 'io.cucumber.core.cli.Main'
+    private static final String CUCUMBER_MAIN_OLD = 'cucumber.api.cli.Main'
 
     /**
      * Result files can be quite large when including embedded images, etc. When checking if a result file is empty,
@@ -75,7 +80,7 @@ class CucumberRunner {
                 applySnippetArguments(args)
                 args << featureFile.absolutePath
 
-                new JavaProcessLauncher('cucumber.api.cli.Main', classpath)
+                new JavaProcessLauncher(cucumberMainClass(classpath), classpath)
                         .setArgs(args)
                         .setJvmArgs(jvmArgs)
                         .setConsoleOutLogFile(consoleOutLogFile)
@@ -106,8 +111,29 @@ class CucumberRunner {
         return !testResultCounter.hadFailures()
     }
 
+    private static String cucumberMainClass(List<File> classpath) {
+        File jar = classpath.find({ file -> file.name.startsWith('cucumber-core') })
+        if (jar) {
+            JarInputStream jarFile = new JarInputStream(new FileInputStream(jar))
+            JarEntry jarEntry
+            while (jarEntry = jarFile.nextJarEntry) {
+                if (jarEntry.name.endsWith(".class")) {
+                    String className = jarEntry.name.replaceAll('/', '.');
+                    className = className.substring(0, className.lastIndexOf('.'));
+                    if (className == CUCUMBER_MAIN_NEW) {
+                        return CUCUMBER_MAIN_NEW
+                    }
+                }
+            }
+        }
+        // fallback to old
+        return CUCUMBER_MAIN_OLD;
+    }
+
     private boolean isResultFileEmpty(File resultsFile) {
-        resultsFile.size() < EMPTY_RESULT_FILE_MAX_SIZE_IN_BYTES && resultsFile.text.replaceAll(/\s+/, '') == '[]'
+        resultsFile.size() == 0 ||
+                (resultsFile.size() < EMPTY_RESULT_FILE_MAX_SIZE_IN_BYTES &&
+                        resultsFile.text.replaceAll(/\s+/, '') == '[]')
     }
 
     String getFeatureNameFromFile(File file, SourceSet sourceSet) {
@@ -157,13 +183,13 @@ class CucumberRunner {
         def hasTags = false
         options.tags.each {
             if (!it.contains(TILDE)) {
-                tagsToCheck += it + ','
+                tagsToCheck += it + ' or '
                 hasTags = true
             }
         }
         if (hasTags) {
             args << TAGS
-            args << tagsToCheck[0..-2]
+            args << tagsToCheck[0..-5]
         }
     }
 
@@ -171,7 +197,7 @@ class CucumberRunner {
         options.tags.each {
             if (it.contains(TILDE)) {
                 args << TAGS
-                args << it
+                args << it.replaceFirst(TILDE, 'not ')
             }
         }
     }
