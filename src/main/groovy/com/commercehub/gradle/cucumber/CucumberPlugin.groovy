@@ -33,11 +33,11 @@ class CucumberPlugin implements Plugin<Project> {
         CucumberTask task
         try {
             task = project.tasks.create(sourceSetName, CucumberTask)
-        } catch (GradleException e) {
+        } catch (GradleException ignored) {
             task = project.tasks.replace(sourceSetName, CucumberTask)
         }
         task.dependsOn cucumberSuiteSourceSet.classesTaskName
-        task.sourceSet = cucumberSuiteSourceSet
+        task.sourceSet(cucumberSuiteSourceSet)
 
         // configure source set in intellij if plugin is applied
         project.plugins.withType(IdeaPlugin) {

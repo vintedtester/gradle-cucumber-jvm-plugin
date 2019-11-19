@@ -83,6 +83,7 @@ class CucumberTask extends Test implements CucumberRunnerOptions {
 
     @SuppressWarnings('ConfusingMethodName')
     def sourceSet(SourceSet sourceSet) {
+        setTestClassesDirs(sourceSet.output.classesDirs)
         this.sourceSet = sourceSet
     }
 
