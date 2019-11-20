@@ -40,6 +40,11 @@ class CucumberTask extends Test implements CucumberRunnerOptions {
     @Input
     Boolean junitReport = null
 
+    CucumberTask() {
+        group = 'verification'
+        description = 'Runs the cucumber tests.'
+    }
+
     @Override
     @TaskAction
     void executeTests() {
