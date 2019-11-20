@@ -3,65 +3,61 @@ package com.commercehub.gradle.cucumber
 import org.gradle.api.Project
 
 /**
- * Created by jgelais on 6/11/15.
+ * The gradle cucumber-jvm plugin provides the ability to run cucumber acceptance tests directly from a gradle build.
  */
 class CucumberExtension {
     /**
-     * Tags used to filter which scenarios should be run.
-     *
-     * Defaults to an empty list.
+     * A list of tags to identify scenarios to run. Defaults to an empty list.
      */
     List<String> tags = []
 
     /**
-     * Maximum number of parallel threads to run features on.
-     *
-     * Defaults to 1.
+     * Maximum number of forked Java processes to start to run tests in parallel. Defaults to `1`.
      */
     int maxParallelForks = 1
 
     /**
-     *
+     * A list of root packages to scan the classpath for glue code. Defaults to `['cucumber.steps', 'cucumber.hooks']`.
      */
     List<String> stepDefinitionRoots = ['cucumber.steps', 'cucumber.hooks']
 
     /**
-     *
+     * A list of root packages to scan the resources folders on the classpath for feature files. Defaults to `['features']`.
      */
     List<String> featureRoots = ['features']
 
     /**
-     *
+     * A list of cucumber plugins passed for execution. Defaults to an empty list.
      */
     List<String> plugins = []
 
     /**
-     *
+     * A boolean value indicating whether glue code execution should be skipped. Defaults to `false`.
      */
     boolean isDryRun = false
 
     /**
-     *
+     * A boolean value indicating whether terminal output should be without colours. Defaults to `false`.
      */
     boolean isMonochrome = false
 
     /**
-     *
+     * A boolean value indicating whether scenarios should be evaluated strictly. Defaults to `false`.
      */
     boolean isStrict = false
 
     /**
-     *
+     * Indicator to cucumber on what style to use for generated step examples. Valid values include `camelcase`, `underscore`. Defaults to `camelcase`.
      */
     String snippets = 'camelcase'
 
     /**
-     * Property to enable/disable junit reporting
+     * Property to enable/disable JUnit reporting. Defaults to `false`.
      */
     boolean junitReport = false
 
     /**
-     * Property to cause or prevent build failure when cucumber tests fail
+     * Property to cause or prevent build failure when cucumber tests fail. Defaults to `false`.
      */
     boolean ignoreFailures = false
 

@@ -8,8 +8,8 @@ import org.gradle.internal.logging.ConsoleRenderer
 import org.gradle.internal.logging.progress.ProgressLoggerFactory
 
 /**
- * Created by jgelais on 6/11/15.
- * rholman 12/12/15 - added logic to shorten uri in json files to relative path.
+ * Parameters set in task overrides values from global plugin configuration.
+ * @see com.commercehub.gradle.cucumber.CucumberExtension
  */
 class CucumberTask extends Test implements CucumberRunnerOptions {
     public static final String CUCUMBER_REPORTS_DIR = 'cucumber'
@@ -19,24 +19,71 @@ class CucumberTask extends Test implements CucumberRunnerOptions {
     SourceSet sourceSet
     private final CucumberExtension extension = project.extensions[CUCUMBER_EXTENSION_NAME]
 
+    /**
+     * A list of tags to identify scenarios to run. Defaults to global plugin configuration.
+     */
     @Input
     List<String> tags = null
+    /**
+     * Maximum number of forked Java processes to start to run tests in parallel.
+     * Defaults to global plugin configuration.
+     * @see com.commercehub.gradle.cucumber.CucumberExtension#maxParallelForks
+     */
     @Input
     Integer maxParallelForks = null
+    /**
+     * A list of root packages to scan the resources folders on the classpath for feature files.
+     * Defaults to global plugin configuration.
+     * @see com.commercehub.gradle.cucumber.CucumberExtension#featureRoots
+     */
     @Input
     List<String> featureRoots = null
+    /**
+     * A list of root packages to scan the classpath for glue code.
+     * Defaults to global plugin configuration.
+     * @see com.commercehub.gradle.cucumber.CucumberExtension#stepDefinitionRoots
+     */
     @Input
     List<String> stepDefinitionRoots = null
+    /**
+     * A list of cucumber plugins passed for execution.
+     * Defaults to global plugin configuration.
+     * @see com.commercehub.gradle.cucumber.CucumberExtension#plugins
+     */
     @Input
     List<String> plugins = null
+    /**
+     * A boolean value indicating whether glue code execution should be skipped.
+     * Defaults to global plugin configuration.
+     * @see com.commercehub.gradle.cucumber.CucumberExtension#isDryRun
+     */
     @Input
     Boolean isDryRun = null
+    /**
+     * A boolean value indicating whether terminal output should be without colours.
+     * Defaults to global plugin configuration.
+     * @see com.commercehub.gradle.cucumber.CucumberExtension#isMonochrome
+     */
     @Input
     Boolean isMonochrome = null
+    /**
+     * A boolean value indicating whether scenarios should be evaluated strictly.
+     * Defaults to global plugin configuration.
+     * @see com.commercehub.gradle.cucumber.CucumberExtension#isStrict
+     */
     @Input
     Boolean isStrict = null
+    /**
+     * Indicator to cucumber on what style to use for generated step examples. Valid values include `camelcase`, `underscore`.
+     * Defaults to global plugin configuration.
+     * @see com.commercehub.gradle.cucumber.CucumberExtension#snippets
+     */
     @Input
     String snippets = null
+    /**
+     * List of arguments to pass to the forked test running JVMs.
+     * Defaults to empty list.
+     */
     @Input
     Boolean junitReport = null
 
