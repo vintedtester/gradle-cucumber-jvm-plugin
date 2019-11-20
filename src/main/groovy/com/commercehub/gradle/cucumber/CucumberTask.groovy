@@ -2,11 +2,7 @@ package com.commercehub.gradle.cucumber
 
 import net.masterthought.cucumber.Configuration
 import org.gradle.api.GradleException
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.OutputFiles
-import org.gradle.api.tasks.SourceSet
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.logging.ConsoleRenderer
 import org.gradle.internal.logging.progress.ProgressLoggerFactory
@@ -42,7 +38,7 @@ class CucumberTask extends Test implements CucumberRunnerOptions {
     @Input
     String snippets = null
     @Input
-    boolean junitReport = null
+    Boolean junitReport = null
 
     @Override
     @TaskAction
@@ -87,7 +83,7 @@ class CucumberTask extends Test implements CucumberRunnerOptions {
         this.sourceSet = sourceSet
     }
 
-    @Internal
+    @OutputDirectory
     File getResultsDir() {
         File projectResultsDir = (File) project.property('testResultsDir')
         File cucumberResults = new File(projectResultsDir, CUCUMBER_REPORTS_DIR)
@@ -97,7 +93,7 @@ class CucumberTask extends Test implements CucumberRunnerOptions {
         return sourceSetResults
     }
 
-    @Internal
+    @OutputDirectory
     File getReportsDir() {
         File projectReportsDir = (File) project.property('reportsDir')
         File sourceSetReports = new File(projectReportsDir, sourceSet.name)
