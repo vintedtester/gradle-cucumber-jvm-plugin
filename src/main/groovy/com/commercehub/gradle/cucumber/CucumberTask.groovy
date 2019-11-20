@@ -70,11 +70,7 @@ class CucumberTask extends Test implements CucumberRunnerOptions {
 
     @Internal
     Configuration getConfiguration() {
-        Configuration configuration = new Configuration(getReportsDir(), "${project.name}-${sourceSet.name}")
-        configuration.parallelTesting = true
-        configuration.runWithJenkins = false
-
-        return configuration
+        return new Configuration(getReportsDir(), "${project.name}-${sourceSet.name}")
     }
 
     @SuppressWarnings('ConfusingMethodName')

@@ -3,6 +3,7 @@ package com.commercehub.gradle.cucumber
 import groovyx.gpars.GParsPool
 import net.masterthought.cucumber.Configuration
 import net.masterthought.cucumber.ReportParser
+import net.masterthought.cucumber.ReportResult
 import net.masterthought.cucumber.json.Feature
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileTree
@@ -149,7 +150,10 @@ class CucumberRunner {
 
     List<Feature> parseFeatureResult(File jsonReport) {
         configuration.getEmbeddingDirectory().mkdirs()
-        return new ReportParser(configuration).parseJsonFiles([jsonReport.absolutePath])
+        ReportParser reportParser = new ReportParser(configuration);
+        List<Feature> featuresFromJson = reportParser.parseJsonFiles([jsonReport.absolutePath])
+        ReportResult reportResult = new ReportResult(featuresFromJson, configuration)
+        return reportResult.getAllFeatures()
     }
 
     CucumberFeatureResult createResult(Feature feature) {
