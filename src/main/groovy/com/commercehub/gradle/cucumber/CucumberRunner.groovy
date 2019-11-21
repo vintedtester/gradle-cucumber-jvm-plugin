@@ -56,7 +56,7 @@ class CucumberRunner {
         this.gradleLogger = gradleLogger
     }
 
-    boolean run(SourceSet sourceSet, File resultsDir, File reportsDir) {
+    boolean run(SourceSet sourceSet, File resultsDir) {
         AtomicBoolean hasFeatureParseErrors = new AtomicBoolean(false)
 
         def features = findFeatures(sourceSet)

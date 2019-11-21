@@ -96,7 +96,7 @@ class CucumberTask extends Test implements CucumberRunnerOptions {
     @TaskAction
     void executeTests() {
         CucumberRunner runner = createRunner()
-        boolean isPassing = runner.run(sourceSet, getResultsDir(), getReportsDir())
+        boolean isPassing = runner.run(sourceSet, getResultsDir())
         new MasterThoughtReportGenerator(this, getConfiguration()).generateReport(jsonReportFiles)
 
         if (!isPassing) {
