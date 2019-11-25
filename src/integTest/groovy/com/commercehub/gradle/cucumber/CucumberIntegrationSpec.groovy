@@ -11,6 +11,16 @@ import org.gradle.api.GradleException
 @SuppressWarnings('DuplicateStringLiteral')
 @Slf4j
 class CucumberIntegrationSpec extends IntegrationSpec {
+
+    @Override
+    protected List<String> calculateArguments(String... args) {
+        def newArgs = ['--warning-mode', 'all']
+        if (args) {
+            newArgs.addAll(args)
+        }
+        super.calculateArguments(newArgs as String[])
+    }
+
     def setup() {
         copyResources('teststeps/TestSteps.groovy', 'src/test/groovy/cucumber/steps/TestSteps.groovy')
         buildFile << '''
@@ -27,8 +37,8 @@ class CucumberIntegrationSpec extends IntegrationSpec {
             }
 
             dependencies {
-                compile 'org.codehaus.groovy:groovy-all:2.4.1'
-                compile 'info.cukes:cucumber-java:1.2.2'
+                implementation 'org.codehaus.groovy:groovy-all:2.4.1'
+                implementation 'info.cukes:cucumber-java:1.2.2'
             }
 
             test {

@@ -1,10 +1,13 @@
 package com.commercehub.gradle.cucumber
 
 import net.masterthought.cucumber.Configuration
-import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.logging.ConsoleRenderer
 import org.gradle.internal.logging.progress.ProgressLoggerFactory
 
@@ -12,51 +15,66 @@ import org.gradle.internal.logging.progress.ProgressLoggerFactory
  * Created by jgelais on 6/11/15.
  * rholman 12/12/15 - added logic to shorten uri in json files to relative path.
  */
-class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
+class CucumberTask extends Test implements CucumberRunnerOptions {
     public static final String CUCUMBER_REPORTS_DIR = 'cucumber'
     public static final String CUCUMBER_EXTENSION_NAME = 'cucumber'
 
+    @Internal
     SourceSet sourceSet
     private final CucumberExtension extension = project.extensions[CUCUMBER_EXTENSION_NAME]
 
+    @Input
     List<String> tags = null
+    @Input
     Integer maxParallelForks = null
+    @Input
     List<String> featureRoots = null
+    @Input
     List<String> stepDefinitionRoots = null
+    @Input
     List<String> plugins = null
+    @Input
     Boolean isDryRun = null
+    @Input
     Boolean isMonochrome = null
+    @Input
     Boolean isStrict = null
+    @Input
     String snippets = null
-    List<String> jvmArgs = []
-    Map<String, String> systemProperties = [:]
+    @Input
     boolean junitReport = null
-    Boolean ignoreFailures = null
 
+    @Override
     @TaskAction
-    void runTests() {
-        ProgressLoggerFactory progressLoggerFactory = services.get(ProgressLoggerFactory)
-        CucumberRunner runner = new CucumberRunner(this, configuration,
-                new CucumberTestResultCounter(progressLoggerFactory, logger), jvmArgs, systemProperties, logger)
-        boolean isPassing = runner.run(sourceSet, resultsDir, reportsDir)
-        new MasterThoughtReportGenerator(this, configuration).generateReport(jsonReportFiles)
+    void executeTests() {
+        CucumberRunner runner = createRunner()
+        boolean isPassing = runner.run(sourceSet, getResultsDir(), getReportsDir())
+        new MasterThoughtReportGenerator(this, getConfiguration()).generateReport(jsonReportFiles)
 
         if (!isPassing) {
             handleTestFailures()
         }
     }
 
+    protected CucumberRunner createRunner() {
+        ProgressLoggerFactory progressLoggerFactory = services.get(ProgressLoggerFactory)
+        new CucumberRunner(this, getConfiguration(),
+                new CucumberTestResultCounter(progressLoggerFactory, logger), jvmArgs, systemProperties, logger)
+    }
+
+    @OutputFiles
     List<File> getJsonReportFiles() {
         List<File> files = []
-        resultsDir.eachFileMatch(~/^.*\.json$/) {
+        getResultsDir().eachFileMatch(~/^.*\.json$/) {
             files << it
         }
 
         return files
     }
 
+    @Internal
     Configuration getConfiguration() {
-        Configuration configuration = new Configuration(reportsDir, "${project.name}-${sourceSet.name}")
+        Configuration configuration = new Configuration(getReportsDir(), "${project.name}-${sourceSet.name}")
         configuration.parallelTesting = true
         configuration.runWithJenkins = false
 
@@ -68,6 +86,7 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
         this.sourceSet = sourceSet
     }
 
+    @Internal
     File getResultsDir() {
         File projectResultsDir = (File) project.property('testResultsDir')
         File cucumberResults = new File(projectResultsDir, CUCUMBER_REPORTS_DIR)
@@ -77,6 +96,7 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
         return sourceSetResults
     }
 
+    @Internal
     File getReportsDir() {
         File projectReportsDir = (File) project.property('reportsDir')
         File sourceSetReports = new File(projectReportsDir, sourceSet.name)
@@ -85,7 +105,7 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
     }
 
     private void handleTestFailures() {
-        String reportUrl = new ConsoleRenderer().asClickableFileUrl(new File(reportsDir, 'cucumber-html-reports/feature-overview.html'))
+        String reportUrl = new ConsoleRenderer().asClickableFileUrl(new File(getReportsDir(), 'cucumber-html-reports/feature-overview.html'))
         String message = "There were failing tests. See the report at: $reportUrl"
 
         if (ignoreFailures ?: extension.ignoreFailures) {
@@ -134,10 +154,6 @@ class CucumberTask extends DefaultTask implements CucumberRunnerOptions {
 
     String getSnippets() {
         return snippets ?: extension.snippets
-    }
-
-    void systemProperty(String property, String value) {
-        systemProperties[property] = value
     }
 
     boolean getJunitReport() {
