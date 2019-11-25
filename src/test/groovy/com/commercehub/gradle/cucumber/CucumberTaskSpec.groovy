@@ -1,8 +1,8 @@
 package com.commercehub.gradle.cucumber
 
-import groovy.mock.interceptor.MockFor
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import spock.lang.Shared
 import spock.lang.Specification
 
 /**
@@ -11,37 +11,35 @@ import spock.lang.Specification
 @SuppressWarnings('DuplicateStringLiteral')
 @SuppressWarnings('DuplicateMapLiteral')
 class CucumberTaskSpec extends Specification {
+    @Shared CucumberRunner cucumberRunnerMock
+
+    def setupSpec() {
+        cucumberRunnerMock = GroovyMock(CucumberRunner) {
+            _ * run(_, _, _) >> true
+        }
+        CucumberTask.metaClass.createRunner = { -> cucumberRunnerMock }
+    }
+
+    def cleanupSpec() {
+        CucumberTask.metaClass.createRunner = null
+    }
 
     def testTaskExecution() {
-        def cucumberRunnerMock = new MockFor(CucumberRunner)
-        cucumberRunnerMock.demand.run { a, b, c ->
-            true
-        }
-
         expect:
         Project project = ProjectBuilder.builder().build()
         project.apply(plugin: 'cucumber-jvm')
         project.addCucumberSuite('test')
         CucumberTask task = (CucumberTask) project.tasks.getByPath('test')
-        cucumberRunnerMock.use {
-            task.runTests()
-        }
+        task.executeTests()
     }
 
     def testTaskExecutionWithIdeaPlugin() {
-        def cucumberRunnerMock = new MockFor(CucumberRunner)
-        cucumberRunnerMock.demand.run { a, b, c ->
-            true
-        }
-
         expect:
         Project project = ProjectBuilder.builder().build()
         project.apply(plugin: 'idea')
         project.apply(plugin: 'cucumber-jvm')
         project.addCucumberSuite('test')
         CucumberTask task = (CucumberTask) project.tasks.getByPath('test')
-        cucumberRunnerMock.use {
-            task.runTests()
-        }
+        task.executeTests()
     }
 }

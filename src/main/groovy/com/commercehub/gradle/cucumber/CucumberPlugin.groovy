@@ -1,5 +1,6 @@
 package com.commercehub.gradle.cucumber
 
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
@@ -29,7 +30,12 @@ class CucumberPlugin implements Plugin<Project> {
                     compileClasspath += project.sourceSets[DEFAULT_PARENT_SOURCESET].compileClasspath
                     runtimeClasspath = it.output + it.compileClasspath
                 }
-        CucumberTask task = project.tasks.replace(sourceSetName, CucumberTask)
+        CucumberTask task
+        try {
+            task = project.tasks.create(sourceSetName, CucumberTask)
+        } catch (GradleException e) {
+            task = project.tasks.replace(sourceSetName, CucumberTask)
+        }
         task.dependsOn cucumberSuiteSourceSet.classesTaskName
         task.sourceSet = cucumberSuiteSourceSet
 
