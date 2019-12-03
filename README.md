@@ -33,7 +33,7 @@ to run up to 3 parallel forks. The `cucumberTest` source set will depend on the 
 ```groovy
 plugins {
     id 'java'
-    id 'com.patdouble.cucumber-jvm' version '0.17'
+    id 'com.patdouble.cucumber-jvm' version '0.18'
 }
 
 addCucumberSuite 'cucumberTest'
@@ -69,7 +69,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "com.patdouble:gradle-cucumber-jvm-plugin:0.17"
+        classpath "com.patdouble:gradle-cucumber-jvm-plugin:0.18"
     }
 }
 apply plugin: 'cucumber-jvm'
@@ -105,7 +105,7 @@ An example `build.gradle.kts` file might look like this:
 ```kotlin
 plugins {
     id("java")
-    id("com.patdouble.cucumber-jvm").version("0.17")
+    id("com.patdouble.cucumber-jvm").version("0.18")
 }
 
 cucumber {
