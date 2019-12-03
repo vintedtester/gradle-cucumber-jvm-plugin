@@ -15,7 +15,7 @@ class CucumberTaskSpec extends Specification {
 
     def setupSpec() {
         cucumberRunnerMock = GroovyMock(CucumberRunner) {
-            _ * run(_, _, _) >> true
+            _ * run(_, _) >> true
         }
         CucumberTask.metaClass.createRunner = { -> cucumberRunnerMock }
     }

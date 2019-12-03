@@ -8,7 +8,7 @@ import org.gradle.api.tasks.SourceSet
 import org.gradle.plugins.ide.idea.IdeaPlugin
 
 /**
- * This is the main plugin file. Put a description of your plugin here.
+ * The gradle cucumber-jvm plugin provides the ability to run cucumber acceptance tests directly from a Gradle build.
  */
 class CucumberPlugin implements Plugin<Project> {
 
@@ -33,11 +33,11 @@ class CucumberPlugin implements Plugin<Project> {
         CucumberTask task
         try {
             task = project.tasks.create(sourceSetName, CucumberTask)
-        } catch (GradleException e) {
+        } catch (GradleException ignored) {
             task = project.tasks.replace(sourceSetName, CucumberTask)
         }
         task.dependsOn cucumberSuiteSourceSet.classesTaskName
-        task.sourceSet = cucumberSuiteSourceSet
+        task.sourceSet(cucumberSuiteSourceSet)
 
         // configure source set in intellij if plugin is applied
         project.plugins.withType(IdeaPlugin) {

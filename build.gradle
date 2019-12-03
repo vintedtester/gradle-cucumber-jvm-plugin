@@ -12,9 +12,8 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.27.0'
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     jcenter()
@@ -33,7 +32,7 @@ repositories {
  */
 def shadowExcludeDependencies = [
     'org.codehaus.gpars:gpars:1.2.1',
-    'org.zeroturnaround:zt-exec:1.10',
+    'org.zeroturnaround:zt-exec:1.11',
     'org.apache.logging.log4j:log4j-core:2.8.2',
     'org.apache.logging.log4j:log4j-api:2.8.2',
     'com.fasterxml.jackson.core:jackson-databind:2.9.6',
@@ -50,7 +49,7 @@ def shadowExcludeDependencies = [
 dependencies {
     shadow gradleApi()
 
-    implementation('net.masterthought:cucumber-reporting:3.20.0') {
+    implementation('net.masterthought:cucumber-reporting:4.11.2') {
         shadowExcludeDependencies.each {
             def split = it.split(':')
             exclude(group: split[0], module: split[1])

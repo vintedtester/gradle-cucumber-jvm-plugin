@@ -8,7 +8,7 @@ import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 
 /**
- * Sends output to the Slf4j logger.
+ * Sends output to the logger.
  */
 @CompileStatic
 class LoggingOutputStream extends OutputStream implements Closeable {
