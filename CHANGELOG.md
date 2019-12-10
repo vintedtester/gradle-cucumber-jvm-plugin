@@ -2,7 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
-## 0.18
+## [0.19]
+
+### Changed
+
+- Shadow Jar replaced with dependencies
+
+### Fixed
+
+- NoClassDefFoundError: groovyx/gpars/GParsPool
+
+## [0.18] - 2019-12-03
 
 ### Added
 

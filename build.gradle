@@ -2,13 +2,12 @@ plugins {
     id 'groovy'
     id 'codenarc'
     id 'com.bmuschko.clover' version '2.2.4'
+    id 'nebula.integtest' version '7.0.4'
     id 'idea'
     id 'maven-publish'
     id 'net.researchgate.release' version '2.8.1'
     id "com.jfrog.bintray" version "1.8.4"
-    id 'nebula.integtest' version '7.0.4'
     id 'com.gradle.plugin-publish' version '0.10.1'
-    id 'com.github.johnrengelman.plugin-shadow' version '2.0.3'
     id 'com.github.ben-manes.versions' version '0.27.0'
 }
 
@@ -20,71 +19,20 @@ repositories {
     mavenCentral()
 }
 
-/*
- * Gradle leaks dependencies into the plugin. Sometimes the plugin gets an incompatible version.
- * For example, with Gradle 4, commons-io is a 1.x version, whereas this plugin needs 2.x. The
- * shadow plugin copies dependencies into the JAR file and repackages them to avoid this problem.
- * We don't want to do all of the dependencies. Some do not work when shadowed, and it makes the
- * plugin JAR large. The following list are dependencies to exclude from shadowing. They must
- * include all dependencies that are excluded by 'shadowJar.dependencies.exclude'. We cannot use
- * this list in the 'exclude' calls, because 'shadowJar.dependencies.exclude' needs to consider
- * transitive dependencies, the follow list should not include transitive.
- */
-def shadowExcludeDependencies = [
-    'org.codehaus.gpars:gpars:1.2.1',
-    'org.zeroturnaround:zt-exec:1.11',
-    'org.apache.logging.log4j:log4j-core:2.8.2',
-    'org.apache.logging.log4j:log4j-api:2.8.2',
-    'com.fasterxml.jackson.core:jackson-databind:2.9.6',
-    'org.apache.velocity:velocity:1.7',
-    'velocity-tools:velocity-tools:1.4',
-    'joda-time:joda-time:2.10',
-    'net.lingala.zip4j:zip4j:1.3.2',
-    'org.codehaus.plexus:plexus-utils:3.1.0',
-    'org.jsoup:jsoup:1.11.3',
-    'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20180219.1',
-    'com.google.guava:guava:20.0'
-]
-
 dependencies {
-    shadow gradleApi()
+    compileOnly gradleApi()
 
-    implementation('net.masterthought:cucumber-reporting:4.11.2') {
-        shadowExcludeDependencies.each {
-            def split = it.split(':')
-            exclude(group: split[0], module: split[1])
-        }
-    }
-    shadow(shadowExcludeDependencies)
+    implementation 'org.codehaus.gpars:gpars:1.2.1'
+    implementation 'org.zeroturnaround:zt-exec:1.11'
+    implementation 'net.masterthought:cucumber-reporting:4.11.2'
 
-    testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
-    testImplementation 'cglib:cglib-nodep:3.3.0'
     testImplementation gradleApi()
-    testImplementation shadowExcludeDependencies
-    testImplementation "org.codehaus.groovy:groovy-all:2.5.8"
     testImplementation 'com.netflix.nebula:nebula-test:7.6.0'
 
-    integTestImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
     integTestImplementation gradleApi()
-    integTestImplementation shadowExcludeDependencies
-    integTestImplementation "org.codehaus.groovy:groovy-all:2.5.8"
     integTestImplementation 'com.netflix.nebula:nebula-test:7.6.0'
 
     clover 'org.openclover:clover:4.4.1'
-}
-
-configureRelocationShadowJar {
-    prefix = 'com.commercehub.gradle.cucumber.shadow'
-}
-
-shadowJar {
-    dependencies {
-        exclude(dependency {
-            // net.masterthought:cucumber-reporting MUST be shadowed so it will reference the shadowed JARs.
-            // We'll shadow all commons dependencies, they are likely to be used in Gradle.
-            !it.moduleGroup.contains('commons') && it.moduleGroup != 'net.masterthought'
-        })
-    }
 }
 
 codenarc {
@@ -110,24 +58,24 @@ integrationTest {
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
 // add javadoc/source jar tasks as artifacts
 artifacts {
-    archives sourcesJar, javadocJar
+    archives sourcesJar, javadocJar, jar
 }
 
 publishing {
     publications {
-        mavenJava(MavenPublication) { publication ->
-            project.shadow.component(publication)
+        mavenJava(MavenPublication) {
+            from components.java
 
             artifact sourcesJar {
                 classifier "sources"
@@ -151,11 +99,6 @@ bintray {
         licenses = ["Apache-2.0"]
         vcsUrl = 'https://github.com/commercehub-oss/gradle-cucumber-jvm-plugin'
     }
-}
-
-jar {
-    enabled = false
-    dependsOn(shadowJar { classifier = null })
 }
 
 bintrayUpload.dependsOn build, sourcesJar, javadocJar
