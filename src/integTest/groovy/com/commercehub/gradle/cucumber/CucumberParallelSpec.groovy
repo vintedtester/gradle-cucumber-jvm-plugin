@@ -107,13 +107,16 @@ class CucumberParallelSpec extends IntegrationSpec {
 
     def testReportsDirectoryCreated() {
         given:
-        copyResources('testfeatures/happypath.feature', 'src/cucumberTest/resoucres/features/happypath.feature')
+        copyResources('testfeatures/happypath.feature', 'src/cucumberTest/resources/features/happypath.feature')
 
         when:
         ExecutionResult result = runTasksSuccessfully('cucumberTest')
 
         then:
         fileExists('build/reports/cucumberTest/cucumber-html-reports/overview-features.html')
+        fileExists('build/reports/cucumberTest/cucumber-html-reports/overview-failures.html')
+        fileExists('build/reports/cucumberTest/cucumber-html-reports/overview-steps.html')
+        fileExists('build/reports/cucumberTest/cucumber-html-reports/overview-tags.html')
     }
 
     def testJunitReport() {
