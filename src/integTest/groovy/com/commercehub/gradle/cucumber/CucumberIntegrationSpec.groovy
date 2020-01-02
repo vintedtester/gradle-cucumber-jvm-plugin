@@ -95,13 +95,16 @@ class CucumberIntegrationSpec extends IntegrationSpec {
 
     def testReportsDirectoryCreated() {
         given:
-        copyResources('testfeatures/happypath.feature', 'src/test/resoucres/features/happypath.feature')
+        copyResources('testfeatures/happypath.feature', 'src/test/resources/features/happypath.feature')
 
         when:
         ExecutionResult result = runTasksSuccessfully('test')
 
         then:
         fileExists('build/reports/test/cucumber-html-reports/overview-features.html')
+        fileExists('build/reports/test/cucumber-html-reports/overview-failures.html')
+        fileExists('build/reports/test/cucumber-html-reports/overview-steps.html')
+        fileExists('build/reports/test/cucumber-html-reports/overview-tags.html')
     }
 
 }
