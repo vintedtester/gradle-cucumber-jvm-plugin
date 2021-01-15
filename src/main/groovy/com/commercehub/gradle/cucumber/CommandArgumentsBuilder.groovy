@@ -13,7 +13,7 @@ class CommandArgumentsBuilder {
         this.options = options
     }
 
-    List<String> buildArguments(File featureFile, File resultsFile, File junitResultsFile) {
+    List<String> buildArguments(List<File> featureBatch, File resultsFile, File junitResultsFile) {
         applyGlueArguments()
         applyPluginArguments(resultsFile, junitResultsFile)
         applyDryRunArguments()
@@ -21,7 +21,9 @@ class CommandArgumentsBuilder {
         applyStrictArguments()
         applyTagsArguments()
         applySnippetArguments()
-        args << featureFile.absolutePath
+        featureBatch.each { featureFile ->
+            args << featureFile.absolutePath
+        }
         return args
     }
 

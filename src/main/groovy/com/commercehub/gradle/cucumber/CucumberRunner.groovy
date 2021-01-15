@@ -53,21 +53,25 @@ class CucumberRunner {
     }
 
     boolean run(SourceSet sourceSet, File resultsDir) {
+        resultsDir.deleteDir()
+        resultsDir.mkdirs()
+
         AtomicBoolean hasFeatureParseErrors = new AtomicBoolean(false)
 
         def features = findFeatures(sourceSet)
         def classpath = sourceSet.runtimeClasspath.toList()
+        def batchSize = (int) Math.ceil(features.files.size() / options.maxParallelForks)
 
         testResultCounter.beforeSuite(features.files.size())
         GParsPool.withPool(options.maxParallelForks) {
-            features.files.eachParallel { File featureFile ->
-                String featureName = getFeatureNameFromFile(featureFile, sourceSet)
-                File resultsFile = new File(resultsDir, "${featureName}.json")
-                File consoleOutLogFile = new File(resultsDir, "${featureName}-out.log")
-                File consoleErrLogFile = new File(resultsDir, "${featureName}-err.log")
-                File junitResultsFile = new File(resultsDir, "${featureName}.xml")
+            features.files.collate(batchSize).eachWithIndexParallel { featureBatch, batchId ->
+                def runId = "feature-batch-${batchId}"
+                File resultsFile = new File(resultsDir, "${runId}.json")
+                File consoleOutLogFile = new File(resultsDir, "${runId}-out.log")
+                File consoleErrLogFile = new File(resultsDir, "${runId}-err.log")
+                File junitResultsFile = new File(resultsDir, "${runId}.xml")
 
-                List<String> args = new CommandArgumentsBuilder(options).buildArguments(featureFile, resultsFile, junitResultsFile);
+                List<String> args = new CommandArgumentsBuilder(options).buildArguments(featureBatch, resultsFile, junitResultsFile);
 
                 new JavaProcessLauncher(cucumberMainClass(classpath), classpath)
                         .setArgs(args)
